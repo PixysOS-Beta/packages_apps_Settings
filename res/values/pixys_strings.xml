@@ -440,4 +440,8 @@
     <string name="aware_summary_when_airplane_on">Unavailable because airplane mode is on</string>
     <string name="aware_summary_when_batterysaver_on">Unavailable because Battery Saver is on</string>
 
+    <!-- Doze on charge --> 
+    <string name="doze_on_charge_title">Always on when charging</string>
+    <string name="doze_on_charge_summary">Always show time and info only when the device is plugged in</string>
+
 </resources>
