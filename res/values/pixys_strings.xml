@@ -127,4 +127,10 @@
     <string name="adaptive_playback_timeout_10_min">10 minutes</string>
     <string name="adaptive_playback_timeout_10_min_summary">On (10 minutes)</string>
     <string name="adaptive_playback_intro_text">Automatically pauses media when the volume is muted and will resume automatically when volume is restored within the set time.</string>
+<<<<<<< HEAD
+=======
+
+   <!-- Black theme -->
+    <string name="system_black_theme_title">Vivid Colors</string>
+    <string name="system_black_theme_summary">Use colorful and darker monet shades</string>
 </resources>
