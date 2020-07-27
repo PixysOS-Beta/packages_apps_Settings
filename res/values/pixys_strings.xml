@@ -103,4 +103,8 @@
     <string name="double_tap_to_sleep_summary">Double-tap anywhere on the status bar to put the device to sleep</string>
     <string name="dtts_gesture_title">Double tap to sleep gesture</string>
     <string name="dtts_gesture_summary">Double tap on statusbar to sleep </string>
+
+<!-- Cycle through ringer modes gesture -->
+    <string name="prevent_ringing_option_cycle">Cycle through modes</string>
+    <string name="prevent_ringing_option_cycle_summary">On (cycle through modes)</string>
 </resources>
