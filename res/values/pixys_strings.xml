@@ -92,4 +92,8 @@
     <!-- Statusbar tuner -->
     <string name="statusbar_tuner_title">Statusbar tuner</string>
 
+    <!-- Left volume panel -->
+    <string name="volume_panel_on_left_title">Show volume panel on left</string>
+    <string name="volume_panel_on_left_summary">Move volume panel to the left side of the screen</string>
+
 </resources>
