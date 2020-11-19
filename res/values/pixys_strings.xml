@@ -475,4 +475,8 @@
     <string name="play_integrity_update_summary">Download and apply latest fingerprint to spoof</string>
     <string name="play_update_title">Update fingerprint</string>
     <string name="play_fingerprint">Current spoofed values</string>
+
+   <!-- Radio Info -->
+    <string name="radio_info_title">Radio info</string>
+
 </resources>
