@@ -72,4 +72,8 @@
 
     <!-- In-call notifications -->
     <string name="in_call_notifications_title">In-call notifications</string>
+
+    <!-- Volume dialog position -->
+    <string name="volume_panel_on_left_title">Left volume panel</string>
+    <string name="volume_panel_on_left_summary">Show the volume panel on the left side of the screen</string>
 </resources>
