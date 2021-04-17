@@ -89,4 +89,7 @@
     <string name="qs_footer_datausage_title">Data usage</string>
     <string name="qs_footer_datausage_summary">Display data usage summary in quick settings footer</string>
 
+    <!-- Statusbar tuner -->
+    <string name="statusbar_tuner_title">Statusbar tuner</string>
+
 </resources>
