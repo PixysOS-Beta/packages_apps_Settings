@@ -55,4 +55,10 @@
     <string name="network_options_title">Options</string>
     <string name="network_traffic_autohide_title">Hide network traffic indicator if inactive</string>
     <string name="network_traffic_autohide_summary">Hide when network traffic indicator is below 1 KB/s</string>
+
+    <!-- Custom Signal bar icons -->
+    <string name="custom_signal_bar_title">Signal</string>
+
+    <!-- Custom Wi-Fi bar icons -->
+    <string name="custom_wifi_bar_title">Wi-Fi</string>
 </resources>
