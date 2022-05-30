@@ -91,6 +91,13 @@
             android:title="@string/enable_fingerprint_ripple_effect_title"
             android:summary="@string/enable_fingerprint_ripple_effect_summary"
             android:defaultValue="true" />
+
+        <com.pixys.support.preference.SystemSettingSwitchPreference
+            android:key="aod_clock_accent"
+            android:title="@string/aod_clock_accent_title"
+            android:summary="@string/aod_clock_accent_summary"
+            android:defaultValue="false" />
+
     </PreferenceCategory>
 
     <PreferenceCategory

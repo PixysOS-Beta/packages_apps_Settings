@@ -320,4 +320,8 @@
     <string name="gesture_navbar_length_title">Pill length</string>
     <string name="short_label">Short</string>
     <string name="long_label">Long</string>
+
+     <!-- AOD clock accent color -->
+     <string name="aod_clock_accent_title">Apply accent color to AOD clock</string>
+     <string name="aod_clock_accent_summary">Apply accent color to AOD clock (Requires SystemUI restart)</string>
 </resources>
