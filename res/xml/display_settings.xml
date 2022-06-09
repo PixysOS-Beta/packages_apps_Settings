@@ -193,5 +193,12 @@
         <ListPreference
             android:key="android.theme.customization.wifi_icon"
             android:title="@string/custom_wifi_bar_title" />
+
+       <com.pixys.support.preference.SystemSettingSwitchPreference
+            android:key="qs_footer_data_usage"
+            android:title="@string/qs_footer_datausage_title"
+            android:summary="@string/qs_footer_datausage_summary"
+            android:defaultValue="false" />
+
     </PreferenceCategory>
 </PreferenceScreen>
