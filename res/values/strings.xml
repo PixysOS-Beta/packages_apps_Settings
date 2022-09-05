@@ -6598,7 +6598,6 @@
     <!-- Help URL, Sound [DO NOT TRANSLATE] -->
     <string name="help_url_sound" translatable="false"></string>
     <!-- Help URL, Battery [DO NOT TRANSLATE] -->
-    <string name="help_url_battery" translatable="false"></string>
     <!-- Help URL, Battery Defender [DO NOT TRANSLATE] -->
     <string name="help_url_battery_defender" translatable="false"></string>
     <!-- Help URL, Dock Defender [DO NOT TRANSLATE] -->
