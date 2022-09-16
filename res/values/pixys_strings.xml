@@ -75,4 +75,15 @@
     <string name="always_on_display_schedule_sunrise">Sunrise</string>
     <string name="always_on_display_schedule_mixed_sunset">Turns on from sunset till a time</string>
     <string name="always_on_display_schedule_mixed_sunrise">Turns on from a time till sunrise</string>
+
+    <!-- Vibration patterns -->
+    <string name="vibration_pattern_title">Ringtone vibration pattern</string>
+    <string name="pattern_dzzz_dzzz">dzzz-dzzz</string>
+    <string name="pattern_dzzz_da">dzzz-da</string>
+    <string name="pattern_mm_mm_mm">mm-mm-mm</string>
+    <string name="pattern_da_da_dzzz">da-da-dzzz</string>
+    <string name="pattern_da_dzzz_da">da-dzzz-da</string>
+    <string name="pattern_custom">Custom</string>
+    <string name="custom_vibration_pattern_title">Custom pattern</string>
+    <string name="custom_vibration_pattern_summary">Set a custom vibration pattern</string>
 </resources>
