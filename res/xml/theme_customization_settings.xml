@@ -35,30 +35,30 @@
         android:key="android.theme.customization.font"
         android:title="@string/theme_customization_font_title"
         android:summary="@string/theme_customization_font_summary"
-        android:fragment="com.pixys.settings.themes.FontsPicker"/>
+        android:fragment="com.pixys.settings.theme.FontsPicker"/>
 
     <Preference
         android:key="android.theme.customization.icon_pack"
         android:title="@string/theme_customization_icon_pack_title"
         android:summary="@string/theme_customization_icon_pack_summary"
-        android:fragment="com.pixys.settings.themes.StatusbarIcons"/>
+        android:fragment="com.pixys.settings.theme.StatusbarIcons"/>
 
     <Preference
         android:key="android.theme.customization.signal_icon"
         android:title="@string/theme_customization_signal_icon_title"
         android:summary="@string/theme_customization_signal_icon_summary"
-        android:fragment="com.pixys.settings.themes.SignalIcons"/>
+        android:fragment="com.pixys.settings.theme.SignalIcons"/>
 
     <Preference
         android:key="android.theme.customization.wifi_icon"
         android:title="@string/theme_customization_wifi_icon_title"
         android:summary="@string/theme_customization_wifi_icon_summary"
-        android:fragment="com.pixys.settings.themes.WifiIcons"/>
+        android:fragment="com.pixys.settings.theme.WifiIcons"/>
 
     <Preference
         android:key="android.theme.customization.adaptive_icon_shape"
         android:title="@string/theme_customization_icon_shape_title"
         android:summary="@string/theme_customization_icon_shape_summary"
-        android:fragment="com.pixys.settings.themes.IconShapes"/>
+        android:fragment="com.pixys.settings.theme.IconShapes"/>
 
 </PreferenceScreen>

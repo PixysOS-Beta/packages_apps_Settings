@@ -4,7 +4,7 @@
  *
  */
 
-package com.pixys.settings.themes;
+package com.pixys.settings.theme;
 
 import android.content.Context;
 

@@ -4,7 +4,7 @@
  *
  */
 
-package com.pixys.settings.themes;
+package com.pixys.settings.theme;
 
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
 import com.android.settings.R;

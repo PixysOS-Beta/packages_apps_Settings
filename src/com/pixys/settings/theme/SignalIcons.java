@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 The PixelDust Project
+ * Copyright (C) 2022 crDroid Android Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.pixys.settings.themes;
+package com.pixys.settings.theme;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -55,27 +55,27 @@ import com.android.settings.SettingsPreferenceFragment;
 
 import com.bumptech.glide.Glide;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Arrays;
 
 import org.json.JSONObject;
 import org.json.JSONException;
 
-public class WifiIcons extends SettingsPreferenceFragment {
+public class SignalIcons extends SettingsPreferenceFragment {
 
     private RecyclerView mRecyclerView;
     private ThemeUtils mThemeUtils;
-    private String mCategory = "android.theme.customization.wifi_icon";
+    private String mCategory = "android.theme.customization.signal_icon";
 
     private List<String> mPkgs;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle(R.string.theme_customization_wifi_icon_title);
+        getActivity().setTitle(R.string.theme_customization_signal_icon_title);
 
         mThemeUtils = new ThemeUtils(getActivity());
         mPkgs = mThemeUtils.getOverlayPackagesForCategory(mCategory, "android");
@@ -126,10 +126,10 @@ public class WifiIcons extends SettingsPreferenceFragment {
         public void onBindViewHolder(CustomViewHolder holder, final int position) {
             String iconPkg = mPkgs.get(position);
 
-            holder.image1.setBackgroundDrawable(getDrawable(holder.image1.getContext(), iconPkg, "ic_wifi_signal_0"));
-            holder.image2.setBackgroundDrawable(getDrawable(holder.image2.getContext(), iconPkg, "ic_wifi_signal_2"));
-            holder.image3.setBackgroundDrawable(getDrawable(holder.image3.getContext(), iconPkg, "ic_wifi_signal_3"));
-            holder.image4.setBackgroundDrawable(getDrawable(holder.image4.getContext(), iconPkg, "ic_wifi_signal_4"));
+            holder.image1.setBackgroundDrawable(getDrawable(holder.image1.getContext(), iconPkg, "ic_signal_cellular_0_5_bar"));
+            holder.image2.setBackgroundDrawable(getDrawable(holder.image2.getContext(), iconPkg, "ic_signal_cellular_1_5_bar"));
+            holder.image3.setBackgroundDrawable(getDrawable(holder.image3.getContext(), iconPkg, "ic_signal_cellular_3_5_bar"));
+            holder.image4.setBackgroundDrawable(getDrawable(holder.image4.getContext(), iconPkg, "ic_signal_cellular_5_5_bar"));
 
             String currentPackageName = mThemeUtils.getOverlayInfos(mCategory).stream()
                 .filter(info -> info.isEnabled())
