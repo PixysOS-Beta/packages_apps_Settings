@@ -2705,8 +2705,8 @@
             android:screenOrientation="portrait"/>
 
         <activity android:name=".biometrics.face.FaceEnrollFinish"
-            android:exported="false"
             android:theme="@style/GlifV4Theme.DayNight"
+            android:exported="true"
             android:screenOrientation="portrait"/>
 
         <activity android:name=".biometrics.BiometricHandoffActivity"
