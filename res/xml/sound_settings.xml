@@ -236,7 +236,7 @@
         android:key="volume_panel_on_left"
         android:title="@string/volume_panel_on_left_title"
         android:summary="@string/volume_panel_on_left_summary"
-        android:defaultValue="false"
+        android:defaultValue="@*android:bool/config_audioPanelOnLeftSide"
         android:order="-28" />
 
     <!-- Show vibrate icon in status bar -->
