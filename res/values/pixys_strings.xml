@@ -324,4 +324,6 @@
      <!-- AOD clock accent color -->
      <string name="aod_clock_accent_title">Apply accent color to AOD clock</string>
      <string name="aod_clock_accent_summary">Apply accent color to AOD clock (Requires SystemUI restart)</string>
+
+    <string name="qs_brightness_haptic_feedback_title">Vibrate on changing brigtness</string>
 </resources>

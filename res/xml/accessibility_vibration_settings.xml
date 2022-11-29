@@ -77,6 +77,13 @@
             app:keywords="@string/keywords_media_vibration"
             app:controller="com.android.settings.accessibility.MediaVibrationTogglePreferenceController" />
 
+
+        <com.pixys.support.preference.SystemSettingSwitchPreference
+            android:key="brightness_slider_haptic_feedback"
+            android:title="@string/qs_brightness_haptic_feedback_title"
+            android:dependency="touch_vibration_preference_screen"
+            android:defaultValue="false" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
