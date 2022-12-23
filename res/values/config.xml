@@ -47,8 +47,8 @@
     <string name="config_styles_and_wallpaper_picker_action">android.intent.action.SET_WALLPAPER</string>
     <string name="config_styles_and_wallpaper_picker_class">com.android.customization.picker.CustomizationPickerActivity</string>
     <string name="config_wallpaper_picker_action">android.intent.action.MAIN</string>
-    <string name="config_wallpaper_picker_class">com.google.android.apps.wallpaper.picker.CategoryPickerActivity</string>
-    <string name="config_wallpaper_picker_package">com.google.android.apps.wallpaper</string>
+    <string name="config_wallpaper_picker_class">com.android.apps.wallpaper.picker.CategoryPickerActivity</string>
+    <string name="config_wallpaper_picker_package">com.android.apps.wallpaper</string>
 
     <!-- Intent extra for wallpaper picker activity. -->
     <string name="config_wallpaper_picker_launch_extra" translatable="false">com.android.wallpaper.LAUNCH_SOURCE</string>
