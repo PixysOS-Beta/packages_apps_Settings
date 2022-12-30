@@ -25,7 +25,6 @@ import com.android.settings.core.BasePreferenceController;
 import com.android.settings.core.SubSettingLauncher;
 import com.android.settings.overlay.FeatureFactory;
 import com.android.settings.safetycenter.SafetyCenterManagerWrapper;
-import com.google.android.settings.security.SecurityHubDashboard;
 
 public class TopLevelSecurityEntryPreferenceController extends BasePreferenceController {
 
@@ -51,7 +50,9 @@ public class TopLevelSecurityEntryPreferenceController extends BasePreferenceCon
             return super.handlePreferenceTreeClick(preference);
         }
 
-        String alternativeFragmentClassname = SecurityHubDashboard.class.getName();
+        String alternativeFragmentClassname =
+                mSecuritySettingsFeatureProvider
+                        .getAlternativeSecuritySettingsFragmentClassname();
         if (alternativeFragmentClassname != null) {
             new SubSettingLauncher(mContext)
                     .setDestination(alternativeFragmentClassname)
@@ -60,7 +61,6 @@ public class TopLevelSecurityEntryPreferenceController extends BasePreferenceCon
                     .launch();
             return true;
         }
-
         return super.handlePreferenceTreeClick(preference);
     }
 }
