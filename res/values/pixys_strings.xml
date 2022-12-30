@@ -321,7 +321,7 @@
     <string name="hidden_apps_title">Hidden apps</string>
     <string name="hidden_apps_summary">Applications that should be hidden from launcher. Requires a launcher restart for changes to take effect</string>
 
-    <!-- SettingsGoogle  -->
+    <!-- SettingsGoogle -->
     <string name="adaptive_charging">Adaptive Charging</string>
     <string name="adaptive_charging_description">Extend battery lifespan by charging steadily during longer charging periods. Activated based on your usage cycle.</string>
     <string name="adaptive_charging_time_estimate">Adaptive charging • Full by %1$s</string>
@@ -362,4 +362,9 @@
     <string name="reverse_charging_unplug_usb_cable_message">Unavailable because USB-C device plugged in</string>
     <string name="reverse_charging_warning_summary">Unavailable because battery is under %1$s</string>
     <string name="reverse_charging_warning_title">Battery Share is unavailable because battery is under %1$s</string>
+    <string name="clear_calling_footer">Clear calling is available depending on your Wi‑Fi and mobile network connection. Content from your call is not sent to Google.</string>
+    <string name="clear_calling_footer_learn_more_link">https://support.google.com/pixelphone?p=clear_calling</string>
+    <string name="clear_calling_title">Clear calling</string>
+    <string name="clear_calling_toggle">Use clear calling</string>
+    <string name="clear_calling_topintro">Reduces background noises during calls</string>
 </resources>

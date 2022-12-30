@@ -103,6 +103,7 @@ android_library {
         "google-securityhub",
         "kotlinx_coroutines_android",
         "kotlinx_coroutines",
+        "clear-calling",
     ],
 
     libs: [
@@ -139,6 +140,12 @@ android_app {
 java_import {
     name: "google-battery",
     jars: ["libs/GooglebatterySettings.jar"],
+    sdk_version: "33",
+}
+
+java_import {
+    name: "clear-calling",
+    jars: ["libs/clearcalling.jar"],
     sdk_version: "33",
 }
 

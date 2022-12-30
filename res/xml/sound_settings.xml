@@ -121,6 +121,14 @@
         settings:controller="com.android.settings.notification.SpatialAudioParentPreferenceController"/>
 
     <Preference
+        android:key="clear_calling"
+        android:title="@string/clear_calling_title"
+        android:summary="@string/clear_calling_topintro"
+        android:order="-55"
+        android:fragment="com.google.android.settings.notification.ClearCallingSettings"
+        settings:controller="com.google.android.settings.notification.ClearCallingPreferenceController"/>
+
+    <Preference
         android:key="media_controls_summary"
         android:title="@string/media_controls_title"
         android:fragment="com.android.settings.sound.MediaControlsSettings"
