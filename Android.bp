@@ -137,7 +137,7 @@ android_app {
     privileged: true,
     required: [
         "privapp_whitelist_com.android.settings",
-        "privapp_whitelist_com.google.android.settings"
+        "privapp_whitelist_com.google.android.settings",
         "settings-platform-compat-config",
     ],
     static_libs: ["Settings-core"],

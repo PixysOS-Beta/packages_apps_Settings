@@ -20,6 +20,13 @@
     xmlns:settings="http://schemas.android.com/apk/res-auto"
     android:title="@string/gesture_preference_title">
 
+
+    <Preference
+        android:title="@string/columbus_title"
+        android:key="columbus_input_summary"
+        android:fragment="com.google.android.settings.gestures.columbus.ColumbusSettings"
+        settings:controller="com.google.android.settings.gestures.columbus.ColumbusPreferenceController"/>
+
     <Preference
         android:key="gesture_assist_input_summary"
         android:title="@string/assist_gesture_title"
