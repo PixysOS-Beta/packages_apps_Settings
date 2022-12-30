@@ -99,7 +99,7 @@ android_library {
         "glide",
         "faceunlock_framework",
         "android.frameworks.stats-V1-java",
-        "google-fuelgauge",
+        "google-battery",
         "google-securityhub",
         "kotlinx_coroutines_android",
         "kotlinx_coroutines",
@@ -136,16 +136,10 @@ android_app {
     },
 }
 
-android_library_import {
-    name: "google-fuelgauge",
-    aars: ["libs/google-fuelgauge.aar"],
+java_import {
+    name: "google-battery",
+    jars: ["libs/GooglebatterySettings.jar"],
     sdk_version: "33",
-    static_libs: [
-        "androidx-constraintlayout_constraintlayout",
-        "androidx.appcompat_appcompat",
-        "androidx.preference_preference",
-        "lottie",
-    ]
 }
 
 android_library_import {
