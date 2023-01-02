@@ -320,4 +320,8 @@
     <string name="gesture_navbar_length_title">Pill length</string>
     <string name="short_label">Short</string>
     <string name="long_label">Long</string>
+
+    <!-- Custom Fonts -->
+    <string name="theme_customization_lock_clock_title">Lockscreen clock font</string>
+    <string name="theme_customization_lock_clock_summary">Set LS clock font style</string>
 </resources>
