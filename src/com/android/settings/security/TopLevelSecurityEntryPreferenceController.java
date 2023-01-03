@@ -50,20 +50,17 @@ public class TopLevelSecurityEntryPreferenceController extends BasePreferenceCon
             return super.handlePreferenceTreeClick(preference);
         }
 
-        if (mSecuritySettingsFeatureProvider.hasAlternativeSecuritySettingsFragment()) {
-            String alternativeFragmentClassname =
-                    mSecuritySettingsFeatureProvider
-                            .getAlternativeSecuritySettingsFragmentClassname();
-            if (alternativeFragmentClassname != null) {
-                new SubSettingLauncher(mContext)
-                        .setDestination(alternativeFragmentClassname)
-                        .setSourceMetricsCategory(getMetricsCategory())
-                        .setIsSecondLayerPage(true)
-                        .launch();
-                return true;
-            }
+        String alternativeFragmentClassname =
+                mSecuritySettingsFeatureProvider
+                        .getAlternativeSecuritySettingsFragmentClassname();
+        if (alternativeFragmentClassname != null) {
+            new SubSettingLauncher(mContext)
+                    .setDestination(alternativeFragmentClassname)
+                    .setSourceMetricsCategory(getMetricsCategory())
+                    .setIsSecondLayerPage(true)
+                    .launch();
+            return true;
         }
-
         return super.handlePreferenceTreeClick(preference);
     }
 }
