@@ -19,7 +19,7 @@ import android.provider.Settings;
 import androidx.preference.SwitchPreference;
 import androidx.preference.Preference;
 
-import com.android.internal.util.banana.BananaUtils;
+import com.android.internal.util.pixys.PixysUtils;
 import com.android.settings.DisplaySettings;
 import com.android.settings.core.PreferenceControllerMixin;
 import com.android.settings.R;
@@ -57,7 +57,7 @@ public class CustomUIPreferenceController extends AbstractPreferenceController i
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         boolean customUIToggleValue = (Boolean) newValue;
         Settings.System.putInt(mContext.getContentResolver(), CUSTOM_UI_TOGGLE, customUIToggleValue ? 1 : 0);
-        BananaUtils.showSystemUiRestartDialog(mContext);
+        PixysUtils.showSystemUiRestartDialog(mContext);
         return true;
     }
 }
