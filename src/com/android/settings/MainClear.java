@@ -16,6 +16,9 @@
 
 package com.android.settings;
 
+import static android.app.admin.DevicePolicyResources.Strings.Settings.PERSONAL_CATEGORY_HEADER;
+import static android.app.admin.DevicePolicyResources.Strings.Settings.WORK_CATEGORY_HEADER;
+
 import static com.android.settingslib.RestrictedLockUtils.EnforcedAdmin;
 
 import android.accounts.Account;
@@ -23,6 +26,7 @@ import android.accounts.AccountManager;
 import android.accounts.AuthenticatorDescription;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.app.settings.SettingsEnums;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -60,6 +64,7 @@ import androidx.annotation.VisibleForTesting;
 
 import com.android.settings.core.InstrumentedFragment;
 import com.android.settings.enterprise.ActionDisabledByAdminDialogHelper;
+import com.android.settings.network.SubscriptionUtil;
 import com.android.settings.password.ChooseLockSettingsHelper;
 import com.android.settings.password.ConfirmLockPattern;
 import com.android.settingslib.RestrictedLockUtilsInternal;
@@ -378,6 +383,14 @@ public class MainClear extends InstrumentedFragment implements OnGlobalLayoutLis
     }
 
     /**
+     * Whether to show any UI which is SIM related.
+     */
+    @VisibleForTesting
+    boolean showAnySubscriptionInfo(Context context) {
+        return (context != null) && SubscriptionUtil.isSimHardwareVisible(context);
+    }
+
+    /**
      * Whether to show strings indicating that the eUICC will be wiped.
      *
      * <p>We show the strings on any device which supports eUICC as long as the eUICC was ever
@@ -386,7 +399,7 @@ public class MainClear extends InstrumentedFragment implements OnGlobalLayoutLis
     @VisibleForTesting
     boolean showWipeEuicc() {
         Context context = getContext();
-        if (!isEuiccEnabled(context)) {
+        if (!showAnySubscriptionInfo(context) || !isEuiccEnabled(context)) {
             return false;
         }
         ContentResolver cr = context.getContentResolver();
@@ -490,9 +503,20 @@ public class MainClear extends InstrumentedFragment implements OnGlobalLayoutLis
 
             if (profilesSize > 1) {
                 View titleView = Utils.inflateCategoryHeader(inflater, contents);
+                titleView.setPadding(0 /* left */, titleView.getPaddingTop(),
+                        0 /* right */, titleView.getPaddingBottom());
                 final TextView titleText = (TextView) titleView.findViewById(android.R.id.title);
-                titleText.setText(userInfo.isManagedProfile() ? R.string.category_work
-                        : R.string.category_personal);
+
+                DevicePolicyManager devicePolicyManager =
+                        context.getSystemService(DevicePolicyManager.class);
+
+                if (userInfo.isManagedProfile()) {
+                    titleText.setText(devicePolicyManager.getResources().getString(
+                            WORK_CATEGORY_HEADER, () -> getString(R.string.category_work)));
+                } else {
+                    titleText.setText(devicePolicyManager.getResources().getString(
+                            PERSONAL_CATEGORY_HEADER, () -> getString(R.string.category_personal)));
+                }
                 contents.addView(titleView);
             }
 

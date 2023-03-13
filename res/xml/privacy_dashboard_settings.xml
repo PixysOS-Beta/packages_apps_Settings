@@ -65,7 +65,7 @@
     <com.android.settingslib.RestrictedSwitchPreference
         android:key="privacy_camera_toggle"
         android:title="@string/camera_toggle_title"
-        android:summary="@string/cam_toggle_description"
+        android:summary="@string/perm_toggle_description"
         settings:controller="com.android.settings.privacy.CameraToggleController"/>
 
     <!-- Microphone toggle -->
@@ -88,6 +88,14 @@
         android:title="@string/lock_screen_notifs_title"
         android:summary="@string/summary_placeholder"
         settings:searchable="false"/>
+
+    <!-- Show media on lock screen -->
+    <SwitchPreference
+        android:key="privacy_media_controls_lockscreen"
+        android:title="@string/media_controls_lockscreen_title"
+        android:summary="@string/media_controls_lockscreen_description"
+        settings:controller=
+            "com.android.settings.sound.MediaControlsLockScreenPreferenceController" />
 
     <!-- Privacy Service -->
     <PreferenceCategory

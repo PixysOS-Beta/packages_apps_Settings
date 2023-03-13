@@ -85,7 +85,9 @@ import com.android.settingslib.graph.SignalDrawable;
 import com.android.settingslib.utils.ThreadUtils;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -261,6 +263,9 @@ public class MobileNetworkUtils {
      * the user has enabled development mode.
      */
     public static boolean showEuiccSettings(Context context) {
+        if (!SubscriptionUtil.isSimHardwareVisible(context)) {
+            return false;
+        }
         long timeForAccess = SystemClock.elapsedRealtime();
         try {
             Boolean isShow = ((Future<Boolean>) ThreadUtils.postOnBackgroundThread(() -> {
@@ -711,15 +716,17 @@ public class MobileNetworkUtils {
         final TelephonyManager tm =
                 (TelephonyManager) context.getSystemService(TelephonyManager.class);
 
+        Set<String> countrySet = new HashSet<>();
         for (int i = 0; i < tm.getPhoneCount(); i++) {
             String countryCode = tm.getNetworkCountryIso(i);
-            if (em.isSupportedCountry(countryCode)) {
-                Log.i(TAG, "isCurrentCountrySupported: eSIM is supported in " + countryCode);
-                return true;
+            if (!TextUtils.isEmpty(countryCode)) {
+                countrySet.add(countryCode);
             }
         }
-        Log.i(TAG, "isCurrentCountrySupported: eSIM is not supported in the current country.");
-        return false;
+        boolean isSupported = countrySet.stream().anyMatch(em::isSupportedCountry);
+        Log.i(TAG, "isCurrentCountrySupported countryCodes: " + countrySet
+                + " eSIMSupported: " + isSupported);
+        return isSupported;
     }
 
     /**

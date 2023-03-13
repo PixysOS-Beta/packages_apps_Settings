@@ -18,46 +18,54 @@ package com.android.settings.dream;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.UserManager;
 
+import androidx.test.core.app.ApplicationProvider;
+
 import com.android.settings.testutils.FakeFeatureFactory;
+import com.android.settings.testutils.shadow.SettingsShadowResources;
 import com.android.settingslib.dream.DreamBackend;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.robolectric.util.ReflectionHelpers;
 
 @RunWith(RobolectricTestRunner.class)
-@Ignore
+@Config(shadows = SettingsShadowResources.class)
 public class WhenToDreamPickerTest {
 
     private WhenToDreamPicker mPicker;
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private DreamBackend mBackend;
-    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
-    private Activity mActivity;
     @Mock
     private UserManager mUserManager;
 
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        when(mActivity.getSystemService(Context.USER_SERVICE)).thenReturn(mUserManager);
+        final Context context = spy(ApplicationProvider.getApplicationContext());
+
+        SettingsShadowResources.overrideResource(
+                com.android.internal.R.bool.config_dreamsEnabledOnBattery,
+                true);
+
+        when(context.getSystemService(Context.USER_SERVICE)).thenReturn(mUserManager);
         FakeFeatureFactory.setupForTest();
 
-        mPicker = new WhenToDreamPicker();
-        mPicker.onAttach((Context) mActivity);
+        mPicker = spy(new WhenToDreamPicker());
+        when(mPicker.getContext()).thenReturn(context);
+        mPicker.onAttach(context);
 
         ReflectionHelpers.setField(mPicker, "mBackend", mBackend);
     }

@@ -72,23 +72,23 @@
         android:order="-160"
         settings:controller="com.android.settings.notification.RingVolumePreferenceController"/>
 
+    <!-- Notification volume -->
+    <com.android.settings.notification.VolumeSeekBarPreference
+        android:key="notification_volume"
+        android:icon="@drawable/ic_notifications"
+        android:title="@string/notification_volume_option_title"
+        android:order="-150"
+        settings:controller=
+            "com.android.settings.notification.NotificationVolumePreferenceController"/>
 
     <!-- Alarm volume -->
     <com.android.settings.notification.VolumeSeekBarPreference
         android:key="alarm_volume"
         android:icon="@*android:drawable/ic_audio_alarm"
         android:title="@string/alarm_volume_option_title"
-        android:order="-150"
-        settings:controller="com.android.settings.notification.AlarmVolumePreferenceController"/>
-
-    <!-- Notification volume -->
-    <com.android.settings.notification.VolumeSeekBarPreference
-        android:key="notification_volume"
-        android:icon="@drawable/ic_notifications"
-        android:title="@string/notification_volume_option_title"
         android:order="-140"
-        settings:controller="com.android.settings.notification.NotificationVolumePreferenceController"/>
-
+        settings:controller="com.android.settings.notification.AlarmVolumePreferenceController"/>
+x
     <!-- TODO(b/174964721): make this a PrimarySwitchPreference -->
     <!-- Interruptions -->
     <com.android.settingslib.RestrictedPreference
@@ -111,6 +111,15 @@
         settings:keywords="@string/sound_settings"/>
 
     <!-- Live Caption -110 and Now Playing -105-->
+
+    <!-- Spatial audio -->
+    <Preference
+        android:key="spatial_audio_summary"
+        android:title="@string/spatial_audio_title"
+        android:fragment="com.android.settings.notification.SpatialAudioSettings"
+        android:order="-107"
+        settings:controller="com.android.settings.notification.SpatialAudioParentPreferenceController"/>
+
     <Preference
         android:key="media_controls_summary"
         android:title="@string/media_controls_title"
@@ -154,13 +163,6 @@
         android:ringtoneType="alarm"
         android:order="-60"/>
 
-    <!-- Spatial audio -->
-    <SwitchPreference
-        android:key="spatial_audio"
-        android:title="@string/spatial_audio_title"
-        android:order="-55"
-        settings:controller="com.android.settings.notification.SpatialAudioPreferenceController"/>
-
     <!-- Dial pad tones -->
     <SwitchPreference
         android:key="dial_pad_tones"
@@ -190,6 +192,12 @@
         android:key="touch_sounds"
         android:title="@string/touch_sounds_title"
         android:order="-30"/>
+
+    <!-- Show vibrate icon in status bar -->
+    <SwitchPreference
+        android:key="vibrate_icon"
+        android:title="@string/vibrate_icon_title"
+        android:order="-27"/>
 
     <!-- Dock speaker plays -->
     <DropDownPreference

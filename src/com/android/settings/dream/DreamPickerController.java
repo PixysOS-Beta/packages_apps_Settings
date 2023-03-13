@@ -16,65 +16,48 @@
 
 package com.android.settings.dream;
 
+import android.app.settings.SettingsEnums;
 import android.content.Context;
-import android.widget.Button;
+import android.graphics.drawable.Drawable;
 
 import androidx.annotation.Nullable;
 import androidx.preference.Preference;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.settings.R;
 import com.android.settings.core.BasePreferenceController;
-import com.android.settings.dream.DreamPickerAdapter.OnItemClickListener;
+import com.android.settings.overlay.FeatureFactory;
+import com.android.settingslib.core.instrumentation.MetricsFeatureProvider;
 import com.android.settingslib.dream.DreamBackend;
+import com.android.settingslib.dream.DreamBackend.DreamInfo;
 import com.android.settingslib.widget.LayoutPreference;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller for the dream picker where the user can select a screensaver.
  */
 public class DreamPickerController extends BasePreferenceController {
-    public static final String KEY = "dream_picker";
 
     private final DreamBackend mBackend;
-    private final List<DreamBackend.DreamInfo> mDreamInfos;
-    private Button mPreviewButton;
+    private final MetricsFeatureProvider mMetricsFeatureProvider;
+    private final List<DreamInfo> mDreamInfos;
     @Nullable
-    private DreamBackend.DreamInfo mActiveDream;
+    private DreamInfo mActiveDream;
+    private DreamAdapter mAdapter;
 
-    private final OnItemClickListener mItemClickListener =
-            new OnItemClickListener() {
-                @Override
-                public void onItemClicked(DreamBackend.DreamInfo dreamInfo) {
-                    mActiveDream = dreamInfo;
-                    mBackend.setActiveDream(
-                            mActiveDream == null ? null : mActiveDream.componentName);
-                    updatePreviewButtonState();
-                }
-            };
-
-    private final OnItemClickListener mCustomizeListener = new OnItemClickListener() {
-        @Override
-        public void onItemClicked(DreamBackend.DreamInfo dreamInfo) {
-            mBackend.launchSettings(mContext, dreamInfo);
-        }
-    };
-
-    public DreamPickerController(Context context, String preferenceKey) {
-        this(context, preferenceKey, DreamBackend.getInstance(context));
+    public DreamPickerController(Context context, String key) {
+        this(context, key, DreamBackend.getInstance(context));
     }
 
-    public DreamPickerController(Context context, String preferenceKey, DreamBackend backend) {
-        super(context, preferenceKey);
+    public DreamPickerController(Context context, String key, DreamBackend backend) {
+        super(context, key);
         mBackend = backend;
         mDreamInfos = mBackend.getDreamInfos();
-    }
-
-    @Override
-    public String getPreferenceKey() {
-        return KEY;
+        mActiveDream = getActiveDreamInfo(mDreamInfos);
+        mMetricsFeatureProvider = FeatureFactory.getFactory(context).getMetricsFeatureProvider();
     }
 
     @Override
@@ -83,56 +66,97 @@ public class DreamPickerController extends BasePreferenceController {
     }
 
     @Override
-    public void updateState(Preference preference) {
-        super.updateState(preference);
+    public void displayPreference(PreferenceScreen screen) {
+        super.displayPreference(screen);
 
-        mActiveDream = getActiveDreamInfo();
+        mAdapter = new DreamAdapter(R.layout.dream_preference_layout,
+                mDreamInfos.stream()
+                        .map(DreamItem::new)
+                        .collect(Collectors.toList()));
 
-        final DreamPickerAdapter adapter =
-                new DreamPickerAdapter(mDreamInfos, mItemClickListener, mCustomizeListener);
+        mAdapter.setEnabled(mBackend.isEnabled());
 
-        final RecyclerView recyclerView =
-                ((LayoutPreference) preference).findViewById(R.id.dream_list);
+        final LayoutPreference pref = screen.findPreference(getPreferenceKey());
+        if (pref == null) {
+            return;
+        }
+        final RecyclerView recyclerView = pref.findViewById(R.id.dream_list);
         recyclerView.setLayoutManager(new AutoFitGridLayoutManager(mContext));
-        recyclerView.setAdapter(adapter);
-
-        mPreviewButton = ((LayoutPreference) preference).findViewById(R.id.preview_button);
-        mPreviewButton.setOnClickListener(v -> mBackend.preview(mActiveDream));
-        updatePreviewButtonState();
+        recyclerView.addItemDecoration(
+                new GridSpacingItemDecoration(mContext, R.dimen.dream_preference_card_padding));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(mAdapter);
     }
 
-    private void updatePreviewButtonState() {
-        final boolean hasDream = mActiveDream != null;
-        mPreviewButton.setClickable(hasDream);
-        mPreviewButton.setEnabled(hasDream);
+    @Override
+    public void updateState(Preference preference) {
+        super.updateState(preference);
+        if (mAdapter != null) {
+            mAdapter.setEnabled(preference.isEnabled());
+        }
     }
 
     @Nullable
-    private DreamBackend.DreamInfo getActiveDreamInfo() {
-        return mDreamInfos
+    private static DreamInfo getActiveDreamInfo(List<DreamInfo> dreamInfos) {
+        return dreamInfos
                 .stream()
                 .filter(d -> d.isActive)
                 .findFirst()
                 .orElse(null);
     }
 
-    /** Grid layout manager that calculates the number of columns for the screen size. */
-    private static final class AutoFitGridLayoutManager extends GridLayoutManager {
-        private final float mColumnWidth;
+    private class DreamItem implements IDreamItem {
+        DreamInfo mDreamInfo;
 
-        AutoFitGridLayoutManager(Context context) {
-            super(context, /* spanCount= */ 1);
-            this.mColumnWidth = context
-                    .getResources()
-                    .getDimensionPixelSize(R.dimen.dream_item_min_column_width);
+        DreamItem(DreamInfo dreamInfo) {
+            mDreamInfo = dreamInfo;
         }
 
         @Override
-        public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
-            final int totalSpace = getWidth() - getPaddingRight() - getPaddingLeft();
-            final int spanCount = Math.max(1, (int) (totalSpace / mColumnWidth));
-            setSpanCount(spanCount);
-            super.onLayoutChildren(recycler, state);
+        public CharSequence getTitle() {
+            return mDreamInfo.caption;
+        }
+
+        @Override
+        public CharSequence getSummary() {
+            return mDreamInfo.description;
+        }
+
+        @Override
+        public Drawable getIcon() {
+            return mDreamInfo.icon;
+        }
+
+        @Override
+        public void onItemClicked() {
+            mActiveDream = mDreamInfo;
+            mBackend.setActiveDream(mDreamInfo.componentName);
+            mMetricsFeatureProvider.action(SettingsEnums.PAGE_UNKNOWN,
+                    SettingsEnums.ACTION_DREAM_SELECT_TYPE, SettingsEnums.DREAM,
+                    mDreamInfo.componentName.flattenToString(), 1);
+        }
+
+        @Override
+        public void onCustomizeClicked() {
+            mBackend.launchSettings(mContext, mDreamInfo);
+        }
+
+        @Override
+        public Drawable getPreviewImage() {
+            return mDreamInfo.previewImage;
+        }
+
+        @Override
+        public boolean isActive() {
+            if (!mAdapter.getEnabled() || mActiveDream == null) {
+                return false;
+            }
+            return mDreamInfo.componentName.equals(mActiveDream.componentName);
+        }
+
+        @Override
+        public boolean allowCustomization() {
+            return isActive() && mDreamInfo.settingsComponentName != null;
         }
     }
 }

@@ -40,7 +40,6 @@ import com.android.settings.core.BasePreferenceController;
 import com.android.settings.core.InstrumentedPreferenceFragment;
 import com.android.settings.overlay.FeatureFactory;
 import com.android.settings.password.ChooseLockSettingsHelper;
-import com.android.settings.slices.Sliceable;
 import com.android.settingslib.RestrictedLockUtils;
 import com.android.settingslib.RestrictedLockUtilsInternal;
 import com.android.settingslib.core.instrumentation.MetricsFeatureProvider;
@@ -102,11 +101,6 @@ public class BuildNumberPreferenceController extends BasePreferenceController im
     @Override
     public boolean useDynamicSliceSummary() {
         return true;
-    }
-
-    @Override
-    public void copy() {
-        Sliceable.setCopyContent(mContext, getSummary(), mContext.getText(R.string.build_number));
     }
 
     @Override
@@ -246,6 +240,8 @@ public class BuildNumberPreferenceController extends BasePreferenceController im
         mDevHitToast = Toast.makeText(mContext, R.string.show_dev_on,
                 Toast.LENGTH_LONG);
         mDevHitToast.show();
+
+        FeatureFactory.getFactory(mContext).getSearchFeatureProvider().sendPreIndexIntent(mContext);
     }
 
     @VisibleForTesting

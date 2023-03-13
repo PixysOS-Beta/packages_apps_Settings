@@ -20,13 +20,22 @@ import static android.provider.Settings.ACTION_SETTINGS_EMBED_DEEP_LINK_ACTIVITY
 import static android.provider.Settings.EXTRA_SETTINGS_EMBEDDED_DEEP_LINK_HIGHLIGHT_MENU_KEY;
 import static android.provider.Settings.EXTRA_SETTINGS_EMBEDDED_DEEP_LINK_INTENT_URI;
 
+import static com.android.settings.SettingsActivity.EXTRA_USER_HANDLE;
+
 import android.animation.LayoutTransition;
 import android.app.ActivityManager;
 import android.app.settings.SettingsEnums;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.UserInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Process;
+import android.os.RemoteException;
+import android.os.UserHandle;
+import android.os.UserManager;
 import android.text.TextUtils;
 import android.util.ArraySet;
 import android.util.FeatureFlagUtils;
@@ -38,6 +47,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toolbar;
 
+import androidx.annotation.VisibleForTesting;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -56,6 +70,8 @@ import com.android.settings.core.CategoryMixin;
 import com.android.settings.core.FeatureFlags;
 import com.android.settings.homepage.contextualcards.ContextualCardsFragment;
 import com.android.settings.overlay.FeatureFactory;
+import com.android.settings.password.PasswordUtils;
+import com.android.settings.safetycenter.SafetyCenterManagerWrapper;
 import com.android.settingslib.Utils;
 import com.android.settingslib.core.lifecycle.HideNonSystemOverlayMixin;
 
@@ -89,6 +105,8 @@ public class SettingsHomepageActivity extends FragmentActivity implements
     private SplitController mSplitController;
     private boolean mIsEmbeddingActivityEnabled;
     private boolean mIsTwoPane;
+    // A regular layout shows icons on homepage, whereas a simplified layout doesn't.
+    private boolean mIsRegularLayout = true;
 
     /** A listener receiving homepage loaded events. */
     public interface HomepageLoadedListener {
@@ -96,8 +114,11 @@ public class SettingsHomepageActivity extends FragmentActivity implements
         void onHomepageLoaded();
     }
 
-    private interface FragmentBuilder<T extends Fragment>  {
-        T build();
+    private interface FragmentCreator<T extends Fragment> {
+        T create();
+
+        /** To initialize after {@link #create} */
+        default void init(Fragment fragment) {}
     }
 
     /**
@@ -149,13 +170,30 @@ public class SettingsHomepageActivity extends FragmentActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_homepage_container);
+
         mIsEmbeddingActivityEnabled = ActivityEmbeddingUtils.isEmbeddingActivityEnabled(this);
+        if (mIsEmbeddingActivityEnabled) {
+            final UserManager um = getSystemService(UserManager.class);
+            final UserInfo userInfo = um.getUserInfo(getUser().getIdentifier());
+            if (userInfo.isManagedProfile()) {
+                final Intent intent = new Intent(getIntent())
+                        .setClass(this, DeepLinkHomepageActivityInternal.class)
+                        .addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT)
+                        .putExtra(EXTRA_USER_HANDLE, getUser());
+                intent.removeFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivityAsUser(intent, um.getPrimaryUser().getUserHandle());
+                finish();
+                return;
+            }
+        }
+
+        setupEdgeToEdge();
+        setContentView(R.layout.settings_homepage_container);
+
         mSplitController = SplitController.getInstance();
         mIsTwoPane = mSplitController.isActivityEmbedded(this);
 
-        final View appBar = findViewById(R.id.app_bar_container);
-        appBar.setMinimumHeight(getSearchBoxHeight());
+        updateAppBarMinHeight();
         initHomepageContainer();
         updateHomepageAppBar();
         updateHomepageBackground();
@@ -176,6 +214,8 @@ public class SettingsHomepageActivity extends FragmentActivity implements
             showSuggestionFragment(scrollNeeded);
             if (FeatureFlagUtils.isEnabled(this, FeatureFlags.CONTEXTUAL_HOME)) {
                 showFragment(() -> new ContextualCardsFragment(), R.id.contextual_cards_content);
+                ((FrameLayout) findViewById(R.id.main_content))
+                        .getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
             }
         }
         mMainFragment = showFragment(() -> {
@@ -185,11 +225,10 @@ public class SettingsHomepageActivity extends FragmentActivity implements
             return fragment;
         }, R.id.main_content);
 
-        ((FrameLayout) findViewById(R.id.main_content))
-                .getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-
         // Launch the intent from deep link for large screen devices.
         launchDeepLinkIntentToRight();
+        updateHomepagePaddings();
+        updateSplitLayout();
     }
 
     @Override
@@ -209,8 +248,19 @@ public class SettingsHomepageActivity extends FragmentActivity implements
         if (isFinishing()) {
             return;
         }
+
+        if (ActivityEmbeddingUtils.isEmbeddingActivityEnabled(this)
+                && (intent.getFlags() & Intent.FLAG_ACTIVITY_CLEAR_TOP) != 0) {
+            initSplitPairRules();
+        }
+
         // Launch the intent from deep link for large screen devices.
         launchDeepLinkIntentToRight();
+    }
+
+    @VisibleForTesting
+    void initSplitPairRules() {
+        new ActivityEmbeddingRulesController(getApplicationContext()).initRules();
     }
 
     @Override
@@ -221,7 +271,56 @@ public class SettingsHomepageActivity extends FragmentActivity implements
             mIsTwoPane = newTwoPaneState;
             updateHomepageAppBar();
             updateHomepageBackground();
+            updateHomepagePaddings();
         }
+        updateSplitLayout();
+    }
+
+    private void updateSplitLayout() {
+        if (!mIsEmbeddingActivityEnabled) {
+            return;
+        }
+
+        if (mIsTwoPane) {
+            if (mIsRegularLayout == ActivityEmbeddingUtils.isRegularHomepageLayout(this)) {
+                // Layout unchanged
+                return;
+            }
+        } else if (mIsRegularLayout) {
+            // One pane mode with the regular layout, not needed to change
+            return;
+        }
+        mIsRegularLayout = !mIsRegularLayout;
+
+        // Update search title padding
+        View searchTitle = findViewById(R.id.search_bar_title);
+        if (searchTitle != null) {
+            int paddingStart = getResources().getDimensionPixelSize(
+                    mIsRegularLayout
+                            ? R.dimen.search_bar_title_padding_start_regular_two_pane
+                            : R.dimen.search_bar_title_padding_start);
+            searchTitle.setPaddingRelative(paddingStart, 0, 0, 0);
+        }
+        // Notify fragments
+        getSupportFragmentManager().getFragments().forEach(fragment -> {
+            if (fragment instanceof SplitLayoutListener) {
+                ((SplitLayoutListener) fragment).onSplitLayoutChanged(mIsRegularLayout);
+            }
+        });
+    }
+
+    private void setupEdgeToEdge() {
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content),
+                (v, windowInsets) -> {
+                    Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                    // Apply the insets paddings to the view.
+                    v.setPadding(insets.left, insets.top, insets.right, insets.bottom);
+
+                    // Return CONSUMED if you don't want the window insets to keep being
+                    // passed down to descendant views.
+                    return WindowInsetsCompat.CONSUMED;
+                });
     }
 
     private void initSearchBarView() {
@@ -258,14 +357,14 @@ public class SettingsHomepageActivity extends FragmentActivity implements
 
         final Window window = getWindow();
         final int color = mIsTwoPane
-                ? Utils.getColorAttrDefaultColor(this, com.android.internal.R.attr.colorSurface)
+                ? getColor(R.color.settings_two_pane_background_color)
                 : Utils.getColorAttrDefaultColor(this, android.R.attr.colorBackground);
 
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         // Update status bar color
         window.setStatusBarColor(color);
         // Update content background.
-        findViewById(R.id.settings_homepage_container).setBackgroundColor(color);
+        findViewById(android.R.id.content).setBackgroundColor(color);
     }
 
     private void showSuggestionFragment(boolean scrollNeeded) {
@@ -284,29 +383,25 @@ public class SettingsHomepageActivity extends FragmentActivity implements
         // Schedule a timer to show the homepage and hide the suggestion on timeout.
         mHomepageView.postDelayed(() -> showHomepageWithSuggestion(false),
                 HOMEPAGE_LOADING_TIMEOUT_MS);
-        final FragmentBuilder<?> fragmentBuilder = () -> {
-            try {
-                return fragmentClass.getConstructor().newInstance();
-            } catch (Exception e) {
-                Log.w(TAG, "Cannot show fragment", e);
-            }
-            return null;
-        };
-        showFragment(fragmentBuilder, R.id.suggestion_content);
+        showFragment(new SuggestionFragCreator(fragmentClass, /* isTwoPaneLayout= */ false),
+                R.id.suggestion_content);
         if (mIsEmbeddingActivityEnabled) {
-            showFragment(fragmentBuilder, R.id.two_pane_suggestion_content);
+            showFragment(new SuggestionFragCreator(fragmentClass, /* isTwoPaneLayout= */ true),
+                    R.id.two_pane_suggestion_content);
         }
     }
 
-    private <T extends Fragment> T showFragment(FragmentBuilder<T> fragmentBuilder, int id) {
+    private <T extends Fragment> T showFragment(FragmentCreator<T> fragmentCreator, int id) {
         final FragmentManager fragmentManager = getSupportFragmentManager();
         final FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         T showFragment = (T) fragmentManager.findFragmentById(id);
 
         if (showFragment == null) {
-            showFragment = fragmentBuilder.build();
+            showFragment = fragmentCreator.create();
+            fragmentCreator.init(showFragment);
             fragmentTransaction.add(id, showFragment);
         } else {
+            fragmentCreator.init(showFragment);
             fragmentTransaction.show(showFragment);
         }
         fragmentTransaction.commit();
@@ -325,7 +420,7 @@ public class SettingsHomepageActivity extends FragmentActivity implements
         }
 
         if (!(this instanceof DeepLinkHomepageActivity
-                || this instanceof SliceDeepLinkHomepageActivity)) {
+                || this instanceof DeepLinkHomepageActivityInternal)) {
             Log.e(TAG, "Not a deep link component");
             finish();
             return;
@@ -354,12 +449,46 @@ public class SettingsHomepageActivity extends FragmentActivity implements
             finish();
             return;
         }
+
+        ActivityInfo targetActivityInfo = null;
+        try {
+            targetActivityInfo = getPackageManager().getActivityInfo(targetComponentName,
+                    /* flags= */ 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Failed to get target ActivityInfo: " + e);
+            finish();
+            return;
+        }
+
+        int callingUid = -1;
+        try {
+            callingUid = ActivityManager.getService().getLaunchedFromUid(getActivityToken());
+        } catch (RemoteException re) {
+            Log.e(TAG, "Not able to get callingUid: " + re);
+            finish();
+            return;
+        }
+
+        if (!hasPrivilegedAccess(callingUid, targetActivityInfo)) {
+            if (!targetActivityInfo.exported) {
+                Log.e(TAG, "Target Activity is not exported");
+                finish();
+                return;
+            }
+
+            if (!isCallingAppPermitted(targetActivityInfo.permission)) {
+                Log.e(TAG, "Calling app must have the permission of deep link Activity");
+                finish();
+                return;
+            }
+        }
+
         targetIntent.setComponent(targetComponentName);
 
         // To prevent launchDeepLinkIntentToRight again for configuration change.
         intent.setAction(null);
 
-        targetIntent.setFlags(targetIntent.getFlags() & ~Intent.FLAG_ACTIVITY_NEW_TASK);
+        targetIntent.removeFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
         targetIntent.addFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
 
         // Sender of intent may want to send intent extra data to the destination of targetIntent.
@@ -370,6 +499,19 @@ public class SettingsHomepageActivity extends FragmentActivity implements
 
         targetIntent.setData(intent.getParcelableExtra(
                 SettingsHomepageActivity.EXTRA_SETTINGS_LARGE_SCREEN_DEEP_LINK_INTENT_DATA));
+
+        // Only allow FLAG_GRANT_READ/WRITE_URI_PERMISSION if calling app has the permission to
+        // access specified Uri.
+        int uriPermissionFlags = targetIntent.getFlags()
+                & (Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        if (targetIntent.getData() != null
+                && uriPermissionFlags != 0
+                && checkUriPermission(targetIntent.getData(), /* pid= */ -1, callingUid,
+                        uriPermissionFlags) == PackageManager.PERMISSION_DENIED) {
+            Log.e(TAG, "Calling app must have the permission to access Uri and grant permission");
+            finish();
+            return;
+        }
 
         // Set 2-pane pair rule for the deep link page.
         ActivityEmbeddingRulesController.registerTwoPanePairRule(this,
@@ -386,7 +528,51 @@ public class SettingsHomepageActivity extends FragmentActivity implements
                 SplitRule.FINISH_ALWAYS,
                 SplitRule.FINISH_ALWAYS,
                 true /* clearTop */);
-        startActivity(targetIntent);
+
+        final UserHandle user = intent.getParcelableExtra(EXTRA_USER_HANDLE, UserHandle.class);
+        if (user != null) {
+            startActivityAsUser(targetIntent, user);
+        } else {
+            startActivity(targetIntent);
+        }
+    }
+
+    // Check if calling app has privileged access to launch Activity of activityInfo.
+    private boolean hasPrivilegedAccess(int callingUid, ActivityInfo activityInfo) {
+        if (TextUtils.equals(PasswordUtils.getCallingAppPackageName(getActivityToken()),
+                    getPackageName())) {
+            return true;
+        }
+
+        int targetUid = -1;
+        try {
+            targetUid = getPackageManager().getApplicationInfo(activityInfo.packageName,
+                    /* flags= */ 0).uid;
+        } catch (PackageManager.NameNotFoundException nnfe) {
+            Log.e(TAG, "Not able to get targetUid: " + nnfe);
+            return false;
+        }
+
+        // When activityInfo.exported is false, Activity still can be launched if applications have
+        // the same user ID.
+        if (UserHandle.isSameApp(callingUid, targetUid)) {
+            return true;
+        }
+
+        // When activityInfo.exported is false, Activity still can be launched if calling app has
+        // root or system privilege.
+        int callingAppId = UserHandle.getAppId(callingUid);
+        if (callingAppId == Process.ROOT_UID || callingAppId == Process.SYSTEM_UID) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @VisibleForTesting
+    boolean isCallingAppPermitted(String permission) {
+        return TextUtils.isEmpty(permission) || PasswordUtils.isCallingAppPermitted(
+                this, getActivityToken(), permission);
     }
 
     private String getHighlightMenuKey() {
@@ -396,13 +582,30 @@ public class SettingsHomepageActivity extends FragmentActivity implements
             final String menuKey = intent.getStringExtra(
                     EXTRA_SETTINGS_EMBEDDED_DEEP_LINK_HIGHLIGHT_MENU_KEY);
             if (!TextUtils.isEmpty(menuKey)) {
-                return menuKey;
+                return maybeRemapMenuKey(menuKey);
             }
         }
         return getString(DEFAULT_HIGHLIGHT_MENU_KEY);
     }
 
-    private void reloadHighlightMenuKey() {
+    private String maybeRemapMenuKey(String menuKey) {
+        boolean isPrivacyOrSecurityMenuKey =
+                getString(R.string.menu_key_privacy).equals(menuKey)
+                        || getString(R.string.menu_key_security).equals(menuKey);
+        boolean isSafetyCenterMenuKey = getString(R.string.menu_key_safety_center).equals(menuKey);
+
+        if (isPrivacyOrSecurityMenuKey && SafetyCenterManagerWrapper.get().isEnabled(this)) {
+            return getString(R.string.menu_key_safety_center);
+        }
+        if (isSafetyCenterMenuKey && !SafetyCenterManagerWrapper.get().isEnabled(this)) {
+            // We don't know if security or privacy, default to security as it is above.
+            return getString(R.string.menu_key_security);
+        }
+        return menuKey;
+    }
+
+    @VisibleForTesting
+    void reloadHighlightMenuKey() {
         mMainFragment.getArguments().putString(SettingsActivity.EXTRA_FRAGMENT_ARG_KEY,
                 getHighlightMenuKey());
         mMainFragment.reloadHighlightMenuKey();
@@ -419,18 +622,67 @@ public class SettingsHomepageActivity extends FragmentActivity implements
         if (!mIsEmbeddingActivityEnabled) {
             return;
         }
+        updateAppBarMinHeight();
         if (mIsTwoPane) {
             findViewById(R.id.homepage_app_bar_regular_phone_view).setVisibility(View.GONE);
             findViewById(R.id.homepage_app_bar_two_pane_view).setVisibility(View.VISIBLE);
+            findViewById(R.id.suggestion_container_two_pane).setVisibility(View.VISIBLE);
         } else {
             findViewById(R.id.homepage_app_bar_regular_phone_view).setVisibility(View.VISIBLE);
             findViewById(R.id.homepage_app_bar_two_pane_view).setVisibility(View.GONE);
+            findViewById(R.id.suggestion_container_two_pane).setVisibility(View.GONE);
         }
     }
 
-    private int getSearchBoxHeight() {
+    private void updateHomepagePaddings() {
+        if (!mIsEmbeddingActivityEnabled) {
+            return;
+        }
+        if (mIsTwoPane) {
+            int padding = getResources().getDimensionPixelSize(
+                    R.dimen.homepage_padding_horizontal_two_pane);
+            mMainFragment.setPaddingHorizontal(padding);
+        } else {
+            mMainFragment.setPaddingHorizontal(0);
+        }
+        mMainFragment.updatePreferencePadding(mIsTwoPane);
+    }
+
+    private void updateAppBarMinHeight() {
         final int searchBarHeight = getResources().getDimensionPixelSize(R.dimen.search_bar_height);
-        final int searchBarMargin = getResources().getDimensionPixelSize(R.dimen.search_bar_margin);
-        return searchBarHeight + searchBarMargin * 2;
+        final int margin = getResources().getDimensionPixelSize(
+                mIsEmbeddingActivityEnabled && mIsTwoPane
+                        ? R.dimen.homepage_app_bar_padding_two_pane
+                        : R.dimen.search_bar_margin);
+        findViewById(R.id.app_bar_container).setMinimumHeight(searchBarHeight + margin * 2);
+    }
+
+    private static class SuggestionFragCreator implements FragmentCreator {
+
+        private final Class<? extends Fragment> mClass;
+        private final boolean mIsTwoPaneLayout;
+
+        SuggestionFragCreator(Class<? extends Fragment> clazz, boolean isTwoPaneLayout) {
+            mClass = clazz;
+            mIsTwoPaneLayout = isTwoPaneLayout;
+        }
+
+        @Override
+        public Fragment create() {
+            try {
+                Fragment fragment = mClass.getConstructor().newInstance();
+                return fragment;
+            } catch (Exception e) {
+                Log.w(TAG, "Cannot show fragment", e);
+            }
+            return null;
+        }
+
+        @Override
+        public void init(Fragment fragment) {
+            if (fragment instanceof SplitLayoutListener) {
+                ((SplitLayoutListener) fragment).setSplitLayoutSupported(mIsTwoPaneLayout);
+            }
+        }
     }
 }

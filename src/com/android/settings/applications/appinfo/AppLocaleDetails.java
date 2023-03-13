@@ -21,69 +21,78 @@ import android.app.Activity;
 import android.app.LocaleManager;
 import android.app.settings.SettingsEnums;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.LocaleList;
-import android.telephony.TelephonyManager;
+import android.os.UserHandle;
+import android.util.FeatureFlagUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.annotation.VisibleForTesting;
-import androidx.appcompat.app.AlertDialog;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceGroup;
 
-import com.android.internal.app.LocalePicker;
-import com.android.internal.app.LocalePicker.LocaleInfo;
 import com.android.settings.R;
+import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.Utils;
 import com.android.settings.applications.AppInfoBase;
+import com.android.settings.applications.AppLocaleUtil;
 import com.android.settings.widget.EntityHeaderController;
 import com.android.settingslib.applications.AppUtils;
+import com.android.settingslib.applications.ApplicationsState.AppEntry;
 import com.android.settingslib.widget.LayoutPreference;
-import com.android.settingslib.widget.RadioButtonPreference;
 
-import com.google.common.collect.Iterables;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 
 /**
- * A fragment to show the current app locale info and help the user to select the expected locale.
+ * TODO(b/223503670): Implement the unittest.
+ * A fragment to show the current app locale info.
  */
-public class AppLocaleDetails extends AppInfoBase implements RadioButtonPreference.OnClickListener {
+public class AppLocaleDetails extends SettingsPreferenceFragment {
     private static final String TAG = "AppLocaleDetails";
 
-    private static final String CATEGORY_KEY_SUGGESTED_LANGUAGES =
-            "category_key_suggested_languages";
-    private static final String CATEGORY_KEY_ALL_LANGUAGES =
-            "category_key_all_languages";
     private static final String KEY_APP_DESCRIPTION = "app_locale_description";
+    private static final String KEY_APP_DISCLAIMER = "app_locale_disclaimer";
 
     private boolean mCreated = false;
-    private AppLocaleDetailsHelper mAppLocaleDetailsHelper;
-
-    private PreferenceGroup mGroupOfSuggestedLocales;
-    private PreferenceGroup mGroupOfSupportedLocales;
+    private String mPackageName;
     private LayoutPreference mPrefOfDescription;
+    private Preference mPrefOfDisclaimer;
+    private ApplicationInfo mApplicationInfo;
+
+    /**
+     * Create a instance of AppLocaleDetails.
+     * @param packageName Indicates which application need to show the locale picker.
+     * @param uid User id.
+     */
+    public static AppLocaleDetails newInstance(String packageName, int uid) {
+        AppLocaleDetails appLocaleDetails = new AppLocaleDetails();
+        Bundle bundle = new Bundle();
+        bundle.putString(AppInfoBase.ARG_PACKAGE_NAME, packageName);
+        bundle.putInt(AppInfoBase.ARG_PACKAGE_UID, uid);
+        appLocaleDetails.setArguments(bundle);
+        return appLocaleDetails;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(R.xml.app_locale_details);
-        mAppLocaleDetailsHelper = new AppLocaleDetailsHelper(getContext(), mPackageName);
+        Bundle bundle = getArguments();
+        mPackageName = bundle.getString(AppInfoBase.ARG_PACKAGE_NAME, "");
+        if (mPackageName.isEmpty()) {
+            Log.d(TAG, "There is no package name.");
+            finish();
+        }
+        int uid = bundle.getInt(AppInfoBase.ARG_PACKAGE_UID, getContext().getUserId());
 
-        mGroupOfSuggestedLocales =
-                getPreferenceScreen().findPreference(CATEGORY_KEY_SUGGESTED_LANGUAGES);
-        mGroupOfSupportedLocales =
-                getPreferenceScreen().findPreference(CATEGORY_KEY_ALL_LANGUAGES);
+        addPreferencesFromResource(R.xml.app_locale_details);
         mPrefOfDescription = getPreferenceScreen().findPreference(KEY_APP_DESCRIPTION);
+        mPrefOfDisclaimer = getPreferenceScreen().findPreference(KEY_APP_DISCLAIMER);
+        mApplicationInfo = getApplicationInfo(mPackageName, uid);
+        setDisclaimerPreference();
     }
 
     // Override here so we don't have an empty screen
@@ -91,8 +100,8 @@ public class AppLocaleDetails extends AppInfoBase implements RadioButtonPreferen
     public View onCreateView(LayoutInflater inflater,
             ViewGroup container,
             Bundle savedInstanceState) {
-        // if we don't have a package info, show a page saying this is unsupported
-        if (mPackageInfo == null) {
+        // if we don't have a package, show a page saying this is unsupported
+        if (mPackageName.isEmpty()) {
             return inflater.inflate(R.layout.manage_applications_apps_unsupported, null);
         }
         return super.onCreateView(inflater, container, savedInstanceState);
@@ -100,49 +109,17 @@ public class AppLocaleDetails extends AppInfoBase implements RadioButtonPreferen
 
     @Override
     public void onResume() {
-        // Update Locales first, before refresh ui.
-        mAppLocaleDetailsHelper.handleAllLocalesData();
         super.onResume();
+        refreshUi();
     }
 
-    @Override
-    protected boolean refreshUi() {
-        if (mAppLocaleDetailsHelper.getSupportedLocales().isEmpty()) {
-            Log.d(TAG, "No supported language.");
-            mGroupOfSuggestedLocales.setVisible(false);
-            mGroupOfSupportedLocales.setVisible(false);
-            mPrefOfDescription.setVisible(true);
-            TextView description = (TextView) mPrefOfDescription.findViewById(R.id.description);
-            Locale locale = mAppLocaleDetailsHelper.getCurrentSystemLocales().get(0);
-            description.setText(getContext().getString(R.string.no_multiple_language_supported,
-                    locale.getDisplayName(locale)));
-            return true;
-        }
-
-        mGroupOfSuggestedLocales.removeAll();
-        mGroupOfSupportedLocales.removeAll();
-        Locale appLocale = AppLocaleDetailsHelper.getAppDefaultLocale(getContext(), mPackageName);
-        setLanguagesPreference(mGroupOfSuggestedLocales,
-                mAppLocaleDetailsHelper.getSuggestedLocales(), appLocale);
-        setLanguagesPreference(mGroupOfSupportedLocales,
-                mAppLocaleDetailsHelper.getSupportedLocales(), appLocale);
-        return true;
+    private void refreshUi() {
+        setDescription();
     }
 
     @Override
     public int getMetricsCategory() {
         return SettingsEnums.APPS_LOCALE_LIST;
-    }
-
-    @Override
-    protected AlertDialog createDialog(int id, int errorCode) {
-        return null;
-    }
-
-    @Override
-    public void onRadioButtonClicked(RadioButtonPreference pref) {
-        mAppLocaleDetailsHelper.setAppDefaultLocale(pref.getKey());
-        refreshUi();
     }
 
     @Override
@@ -153,7 +130,7 @@ public class AppLocaleDetails extends AppInfoBase implements RadioButtonPreferen
             return;
         }
         mCreated = true;
-        if (mPackageInfo == null) {
+        if (mPackageName == null) {
             return;
         }
         // Creates a head icon button of app on this page.
@@ -161,197 +138,82 @@ public class AppLocaleDetails extends AppInfoBase implements RadioButtonPreferen
         final Preference pref = EntityHeaderController
                 .newInstance(activity, this, null /* header */)
                 .setRecyclerView(getListView(), getSettingsLifecycle())
-                .setIcon(Utils.getBadgedIcon(getContext(), mPackageInfo.applicationInfo))
-                .setLabel(mPackageInfo.applicationInfo.loadLabel(mPm))
-                .setIsInstantApp(AppUtils.isInstant(mPackageInfo.applicationInfo))
+                .setIcon(Utils.getBadgedIcon(getContext(), mApplicationInfo))
+                .setLabel(mApplicationInfo.loadLabel(getContext().getPackageManager()))
+                .setIsInstantApp(AppUtils.isInstant(mApplicationInfo))
                 .setPackageName(mPackageName)
-                .setUid(mPackageInfo.applicationInfo.uid)
+                .setUid(mApplicationInfo.uid)
                 .setHasAppInfoLink(true)
                 .setButtonActions(ActionType.ACTION_NONE, ActionType.ACTION_NONE)
+                .setOrder(10)
                 .done(activity, getPrefContext());
         getPreferenceScreen().addPreference(pref);
+    }
+
+    private void setDisclaimerPreference() {
+        if (FeatureFlagUtils.isEnabled(
+                getContext(), FeatureFlagUtils.SETTINGS_APP_LOCALE_OPT_IN_ENABLED)) {
+            mPrefOfDisclaimer.setVisible(false);
+        }
+    }
+
+    private void setDescription() {
+        int res = getAppDescription();
+        if (res != -1) {
+            mPrefOfDescription.setVisible(true);
+            TextView description = (TextView) mPrefOfDescription.findViewById(R.id.description);
+            description.setText(getContext().getString(res));
+        }
+    }
+
+    private ApplicationInfo getApplicationInfo(String packageName, int userId) {
+        ApplicationInfo applicationInfo;
+        try {
+            applicationInfo = getContext().getPackageManager()
+                    .getApplicationInfoAsUser(packageName, /* flags= */ 0, userId);
+            return applicationInfo;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.w(TAG, "Application info not found for: " + packageName);
+            return null;
+        }
+    }
+
+    private int getAppDescription() {
+        LocaleList packageLocaleList = AppLocaleUtil.getPackageLocales(getContext(), mPackageName);
+        String[] assetLocaleList = AppLocaleUtil.getAssetLocales(getContext(), mPackageName);
+        // TODO add apended url string, "Learn more", to these both sentenses.
+        if ((packageLocaleList != null && packageLocaleList.isEmpty())
+                || (packageLocaleList == null && assetLocaleList.length == 0)) {
+            return R.string.desc_no_available_supported_locale;
+        }
+        return -1;
+    }
+
+    /** Gets per app's default locale */
+    public static Locale getAppDefaultLocale(Context context, String packageName) {
+        LocaleManager localeManager = context.getSystemService(LocaleManager.class);
+        try {
+            LocaleList localeList = (localeManager == null)
+                    ? null : localeManager.getApplicationLocales(packageName);
+            return localeList == null ? null : localeList.get(0);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "package name : " + packageName + " is not correct. " + e);
+        }
+        return null;
     }
 
     /**
      * TODO (b209962418) Do a performance test to low end device.
      * @return Return the summary to show the current app's language.
      */
-    public static CharSequence getSummary(Context context, String packageName) {
-        Locale appLocale =
-                AppLocaleDetailsHelper.getAppDefaultLocale(context, packageName);
-        return appLocale == null ? "" : appLocale.getDisplayName(appLocale);
-    }
-
-    private void setLanguagesPreference(PreferenceGroup group,
-            Collection<Locale> locales, Locale appLocale) {
-        if (locales == null) {
-            return;
-        }
-
-        for (Locale locale : locales) {
-            RadioButtonPreference pref = new RadioButtonPreference(getContext());
-            pref.setTitle(locale.getDisplayName(locale));
-            pref.setKey(locale.toLanguageTag());
-            pref.setChecked(locale.equals(appLocale));
-            pref.setOnClickListener(this);
-            group.addPreference(pref);
-        }
-    }
-
-    @VisibleForTesting
-    static class AppLocaleDetailsHelper {
-        private String mPackageName;
-        private Context mContext;
-        private TelephonyManager mTelephonyManager;
-        private LocaleManager mLocaleManager;
-
-        private Collection<Locale> mSuggestedLocales = new ArrayList<>();
-        private Collection<Locale> mSupportedLocales = new ArrayList<>();
-
-        AppLocaleDetailsHelper(Context context, String packageName) {
-            mContext = context;
-            mPackageName = packageName;
-            mTelephonyManager = context.getSystemService(TelephonyManager.class);
-            mLocaleManager = context.getSystemService(LocaleManager.class);
-        }
-
-        /** Handle suggested and supported locales for UI display. */
-        public void handleAllLocalesData() {
-            clearLocalesData();
-            handleSuggestedLocales();
-            handleSupportedLocales();
-        }
-
-        /** Gets suggested locales in the app. */
-        public Collection<Locale> getSuggestedLocales() {
-            return mSuggestedLocales;
-        }
-
-        /** Gets supported locales in the app. */
-        public Collection<Locale> getSupportedLocales() {
-            return mSupportedLocales;
-        }
-
-        @VisibleForTesting
-        void handleSuggestedLocales() {
-            LocaleList currentSystemLocales = getCurrentSystemLocales();
-            Locale appLocale = getAppDefaultLocale(mContext, mPackageName);
-            String simCountry = mTelephonyManager.getSimCountryIso().toUpperCase(Locale.US);
-            String networkCountry = mTelephonyManager.getNetworkCountryIso().toUpperCase(Locale.US);
-            // 1st locale in suggested languages group.
-            if (appLocale != null) {
-                mSuggestedLocales.add(appLocale);
-            }
-            // 2nd locale in suggested languages group.
-            final List<LocaleInfo> localeInfos = LocalePicker.getAllAssetLocales(mContext, false);
-            for (LocaleInfo localeInfo : localeInfos) {
-                Locale locale = localeInfo.getLocale();
-                String localeCountry = locale.getCountry().toUpperCase(Locale.US);
-                if (!compareLocale(locale, appLocale)
-                        && isCountrySuggestedLocale(localeCountry, simCountry, networkCountry)) {
-                    mSuggestedLocales.add(locale);
-                }
-            }
-            // Other locales in suggested languages group.
-            for (int i = 0; i < currentSystemLocales.size(); i++) {
-                Locale locale = currentSystemLocales.get(i);
-                boolean isInSuggestedLocales = false;
-                for (int j = 0; j < mSuggestedLocales.size(); j++) {
-                    Locale suggestedLocale = Iterables.get(mSuggestedLocales, j);
-                    if (compareLocale(locale, suggestedLocale)) {
-                        isInSuggestedLocales = true;
-                        break;
-                    }
-                }
-                if (!isInSuggestedLocales) {
-                    mSuggestedLocales.add(locale);
-                }
-            }
-        }
-
-        @VisibleForTesting
-        static boolean compareLocale(Locale source, Locale target) {
-            if (source == null && target == null) {
-                return true;
-            } else if (source != null && target != null) {
-                return LocaleList.matchesLanguageAndScript(source, target);
-            } else {
-                return false;
-            }
-        }
-
-        private static boolean isCountrySuggestedLocale(String localeCountry,
-                String simCountry,
-                String networkCountry) {
-            return ((!simCountry.isEmpty() && simCountry.equals(localeCountry))
-                    || (!networkCountry.isEmpty() && networkCountry.equals(localeCountry)));
-        }
-
-        @VisibleForTesting
-        void handleSupportedLocales() {
-            //TODO Waiting for PackageManager api
-            String[] languages = getAssetSystemLocales();
-
-            for (String language : languages) {
-                mSupportedLocales.add(Locale.forLanguageTag(language));
-            }
-            if (mSuggestedLocales != null || !mSuggestedLocales.isEmpty()) {
-                mSupportedLocales.removeAll(mSuggestedLocales);
-            }
-        }
-
-        private void clearLocalesData() {
-            mSuggestedLocales.clear();
-            mSupportedLocales.clear();
-        }
-
-        /** Gets per app's default locale */
-        public static Locale getAppDefaultLocale(Context context, String packageName) {
-            LocaleManager localeManager = context.getSystemService(LocaleManager.class);
-            try {
-                LocaleList localeList = (localeManager == null)
-                        ? new LocaleList() : localeManager.getApplicationLocales(packageName);
-                return localeList.isEmpty() ? null : localeList.get(0);
-            } catch (IllegalArgumentException e) {
-                Log.w(TAG, "package name : " + packageName + " is not correct. " + e);
-            }
-            return null;
-        }
-
-        /** Sets per app's default language to system. */
-        public void setAppDefaultLocale(String languageTag) {
-            if (languageTag.isEmpty()) {
-                Log.w(TAG, "[setAppDefaultLocale] No language tag.");
-                return;
-            }
-            setAppDefaultLocale(LocaleList.forLanguageTags(languageTag));
-        }
-
-        /** Sets per app's default language to system. */
-        public void setAppDefaultLocale(LocaleList localeList) {
-            if (mLocaleManager == null) {
-                Log.w(TAG, "LocaleManager is null, and cannot set the app locale up.");
-                return;
-            }
-            mLocaleManager.setApplicationLocales(mPackageName, localeList);
-        }
-
-        @VisibleForTesting
-        LocaleList getCurrentSystemLocales() {
-            return Resources.getSystem().getConfiguration().getLocales();
-        }
-
-        @VisibleForTesting
-        String[] getAssetSystemLocales() {
-            try {
-                PackageManager packageManager = mContext.getPackageManager();
-                return packageManager.getResourcesForApplication(
-                        packageManager.getPackageInfo(mPackageName, PackageManager.MATCH_ALL)
-                                .applicationInfo).getAssets().getNonSystemLocales();
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.w(TAG, "Can not found the package name : " + e);
-            }
-            return new String[0];
+    public static CharSequence getSummary(Context context, AppEntry entry) {
+        final UserHandle userHandle = UserHandle.getUserHandleForUid(entry.info.uid);
+        final Context contextAsUser = context.createContextAsUser(userHandle, 0);
+        Locale appLocale = getAppDefaultLocale(contextAsUser, entry.info.packageName);
+        if (appLocale == null) {
+            return context.getString(R.string.preference_of_system_locale_summary);
+        } else {
+            return appLocale.getDisplayName(appLocale);
         }
     }
 }

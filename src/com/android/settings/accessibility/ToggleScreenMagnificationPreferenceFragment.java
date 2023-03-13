@@ -23,9 +23,11 @@ import static com.android.settings.accessibility.AccessibilityUtil.State.ON;
 
 import android.app.Dialog;
 import android.app.settings.SettingsEnums;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.icu.text.CaseMap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,6 +48,7 @@ import com.android.internal.annotations.VisibleForTesting;
 import com.android.settings.DialogCreatable;
 import com.android.settings.R;
 import com.android.settings.accessibility.AccessibilityDialogUtils.DialogType;
+import com.android.settings.accessibility.AccessibilityUtil.QuickSettingsTooltipType;
 import com.android.settings.accessibility.AccessibilityUtil.UserShortcutType;
 import com.android.settings.utils.LocaleUtils;
 
@@ -106,10 +109,10 @@ public class ToggleScreenMagnificationPreferenceFragment extends
     private void updateFooterPreference() {
         final String title = getPrefContext().getString(
                 R.string.accessibility_screen_magnification_about_title);
-        final String learnMoreContentDescription = getPrefContext().getString(
+        final String learnMoreText = getPrefContext().getString(
                 R.string.accessibility_screen_magnification_footer_learn_more_content_description);
         mFooterPreferenceController.setIntroductionTitle(title);
-        mFooterPreferenceController.setupHelpLink(getHelpResource(), learnMoreContentDescription);
+        mFooterPreferenceController.setupHelpLink(getHelpResource(), learnMoreText);
         mFooterPreferenceController.displayPreference(getPreferenceScreen());
     }
 
@@ -144,8 +147,7 @@ public class ToggleScreenMagnificationPreferenceFragment extends
                 return AccessibilityGestureNavigationTutorial
                         .showAccessibilityGestureTutorialDialog(getPrefContext());
             case DialogEnums.MAGNIFICATION_EDIT_SHORTCUT:
-                final CharSequence dialogTitle = getPrefContext().getString(
-                        R.string.accessibility_shortcut_title, mPackageName);
+                final CharSequence dialogTitle = getShortcutTitle();
                 final int dialogType = WizardManagerHelper.isAnySetupWizard(getIntent())
                         ? DialogType.EDIT_SHORTCUT_MAGNIFICATION_SUW
                         : DialogType.EDIT_SHORTCUT_MAGNIFICATION;
@@ -160,9 +162,14 @@ public class ToggleScreenMagnificationPreferenceFragment extends
 
     @Override
     protected void initSettingsPreference() {
-        // If the device doesn't support magnification area, it should hide the settings preference.
-        if (!getContext().getResources().getBoolean(
-                com.android.internal.R.bool.config_magnification_area)) {
+        // If the device doesn't support window magnification feature, it should hide the
+        // settings preference.
+        final boolean supportWindowMagnification =
+                getContext().getResources().getBoolean(
+                        com.android.internal.R.bool.config_magnification_area)
+                        && getContext().getPackageManager().hasSystemFeature(
+                        PackageManager.FEATURE_WINDOW_MAGNIFICATION);
+        if (!supportWindowMagnification) {
             return;
         }
         mSettingsPreference = new Preference(getPrefContext());
@@ -359,6 +366,10 @@ public class ToggleScreenMagnificationPreferenceFragment extends
         mShortcutPreference.setChecked(value != UserShortcutType.EMPTY);
         mShortcutPreference.setSummary(
                 getShortcutTypeSummary(getPrefContext()));
+
+        if (mHardwareTypeCheckBox.isChecked()) {
+            AccessibilityUtil.skipVolumeShortcutDialogTimeoutRestriction(getPrefContext());
+        }
     }
 
     @Override
@@ -396,6 +407,16 @@ public class ToggleScreenMagnificationPreferenceFragment extends
     @Override
     int getUserShortcutTypes() {
         return getUserShortcutTypeFromSettings(getPrefContext());
+    }
+
+    @Override
+    ComponentName getTileComponentName() {
+        return null;
+    }
+
+    @Override
+    CharSequence getTileTooltipContent(@QuickSettingsTooltipType int type) {
+        return null;
     }
 
     @Override
@@ -448,17 +469,15 @@ public class ToggleScreenMagnificationPreferenceFragment extends
         mShortcutPreference.setKey(getShortcutPreferenceKey());
         mShortcutPreference.setSummary(getShortcutTypeSummary(getPrefContext()));
         mShortcutPreference.setOnClickCallback(this);
-
-        final CharSequence title = getString(R.string.accessibility_shortcut_title, mPackageName);
-        mShortcutPreference.setTitle(title);
+        mShortcutPreference.setTitle(getShortcutTitle());
 
         final PreferenceCategory generalCategory = findPreference(KEY_GENERAL_CATEGORY);
         generalCategory.addPreference(mShortcutPreference);
     }
 
     @Override
-    protected void updateShortcutTitle(ShortcutPreference shortcutPreference) {
-        shortcutPreference.setTitle(R.string.accessibility_screen_magnification_shortcut_title);
+    protected CharSequence getShortcutTitle() {
+        return getText(R.string.accessibility_screen_magnification_shortcut_title);
     }
 
     @Override

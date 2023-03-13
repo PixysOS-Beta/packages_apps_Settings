@@ -28,7 +28,6 @@ import androidx.annotation.IntDef;
 import androidx.annotation.VisibleForTesting;
 
 import com.android.settings.Utils;
-import com.android.settings.homepage.contextualcards.slices.BatteryFixSlice;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -99,6 +98,7 @@ public class BatteryBroadcastReceiver extends BroadcastReceiver {
         final IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         intentFilter.addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED);
+        intentFilter.addAction(BatteryUtils.BYPASS_DOCK_DEFENDER_ACTION);
 
         final Intent intent = mContext.registerReceiver(this, intentFilter);
         updateBatteryStatus(intent, true /* forceUpdate */);
@@ -112,7 +112,8 @@ public class BatteryBroadcastReceiver extends BroadcastReceiver {
         if (intent != null && mBatteryListener != null) {
             if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
                 final String batteryLevel = Utils.getBatteryPercentage(intent);
-                final String batteryStatus = Utils.getBatteryStatus(mContext, intent);
+                final String batteryStatus =
+                        Utils.getBatteryStatus(mContext, intent, /* compactStatus= */ false);
                 final int batteryHealth = intent.getIntExtra(
                         BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
                 if (!Utils.isBatteryPresent(intent)) {
@@ -132,8 +133,9 @@ public class BatteryBroadcastReceiver extends BroadcastReceiver {
                 mBatteryHealth = batteryHealth;
             } else if (PowerManager.ACTION_POWER_SAVE_MODE_CHANGED.equals(intent.getAction())) {
                 mBatteryListener.onBatteryChanged(BatteryUpdateType.BATTERY_SAVER);
+            } else if (BatteryUtils.BYPASS_DOCK_DEFENDER_ACTION.equals(intent.getAction())) {
+                mBatteryListener.onBatteryChanged(BatteryUpdateType.BATTERY_STATUS);
             }
         }
-        BatteryFixSlice.updateBatteryTipAvailabilityCache(mContext);
     }
 }

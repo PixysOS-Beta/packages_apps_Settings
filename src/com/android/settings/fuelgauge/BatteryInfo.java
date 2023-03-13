@@ -49,6 +49,7 @@ public class BatteryInfo {
     public CharSequence remainingLabel;
     public int batteryLevel;
     public int batteryStatus;
+    public int pluggedStatus;
     public boolean discharging = true;
     public boolean isOverheated;
     public long remainingTimeUs = 0;
@@ -153,6 +154,7 @@ public class BatteryInfo {
         new AsyncTask<Void, Void, BatteryInfo>() {
             @Override
             protected BatteryInfo doInBackground(Void... params) {
+                boolean shouldCloseBatteryUsageStats = false;
                 BatteryUsageStats stats;
                 if (batteryUsageStats != null) {
                     stats = batteryUsageStats;
@@ -160,6 +162,7 @@ public class BatteryInfo {
                     try {
                         stats = context.getSystemService(BatteryStatsManager.class)
                                 .getBatteryUsageStats();
+                        shouldCloseBatteryUsageStats = true;
                     } catch (RuntimeException e) {
                         Log.e(TAG, "getBatteryInfo() from getBatteryUsageStats()", e);
                         // Use default BatteryUsageStats.
@@ -168,10 +171,12 @@ public class BatteryInfo {
                 }
                 final BatteryInfo batteryInfo =
                         getBatteryInfo(context, stats, shortString);
-                try {
-                    stats.close();
-                } catch (Exception e) {
-                    Log.e(TAG, "BatteryUsageStats.close() failed", e);
+                if (shouldCloseBatteryUsageStats) {
+                    try {
+                        stats.close();
+                    } catch (Exception e) {
+                        Log.e(TAG, "BatteryUsageStats.close() failed", e);
+                    }
                 }
                 return batteryInfo;
             }
@@ -243,55 +248,67 @@ public class BatteryInfo {
             @NonNull BatteryUsageStats batteryUsageStats, Estimate estimate,
             long elapsedRealtimeUs, boolean shortString) {
         final long startTime = System.currentTimeMillis();
+        final boolean isCompactStatus = context.getResources().getBoolean(
+                com.android.settings.R.bool.config_use_compact_battery_status);
         BatteryInfo info = new BatteryInfo();
         info.mBatteryUsageStats = batteryUsageStats;
         info.batteryLevel = Utils.getBatteryLevel(batteryBroadcast);
         info.batteryPercentString = Utils.formatPercentage(info.batteryLevel);
-        info.mCharging = batteryBroadcast.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) != 0;
+        info.pluggedStatus = batteryBroadcast.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+        info.mCharging = info.pluggedStatus != 0;
         info.averageTimeToDischarge = estimate.getAverageDischargeTime();
         info.isOverheated = batteryBroadcast.getIntExtra(
                 BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
                 == BatteryManager.BATTERY_HEALTH_OVERHEAT;
 
-        info.statusLabel = Utils.getBatteryStatus(context, batteryBroadcast);
+        info.statusLabel = Utils.getBatteryStatus(context, batteryBroadcast, isCompactStatus);
         info.batteryStatus = batteryBroadcast.getIntExtra(
                 BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
         if (!info.mCharging) {
             updateBatteryInfoDischarging(context, shortString, estimate, info);
         } else {
             updateBatteryInfoCharging(context, batteryBroadcast, batteryUsageStats,
-                    info);
+                    info, isCompactStatus);
         }
         BatteryUtils.logRuntime(LOG_TAG, "time for getBatteryInfo", startTime);
         return info;
     }
 
     private static void updateBatteryInfoCharging(Context context, Intent batteryBroadcast,
-            BatteryUsageStats stats, BatteryInfo info) {
+            BatteryUsageStats stats, BatteryInfo info, boolean compactStatus) {
         final Resources resources = context.getResources();
         final long chargeTimeMs = stats.getChargeTimeRemainingMs();
         final int status = batteryBroadcast.getIntExtra(BatteryManager.EXTRA_STATUS,
                 BatteryManager.BATTERY_STATUS_UNKNOWN);
         info.discharging = false;
         info.suggestionLabel = null;
-        if (info.isOverheated && status != BatteryManager.BATTERY_STATUS_FULL) {
+        int dockDefenderMode = BatteryUtils.getCurrentDockDefenderMode(context, info);
+        if ((info.isOverheated && status != BatteryManager.BATTERY_STATUS_FULL
+                && dockDefenderMode == BatteryUtils.DockDefenderMode.DISABLED)
+                || dockDefenderMode == BatteryUtils.DockDefenderMode.ACTIVE) {
+            // Battery defender active, battery charging paused
             info.remainingLabel = null;
             int chargingLimitedResId = R.string.power_charging_limited;
-            info.chargeLabel =
-                context.getString(chargingLimitedResId, info.batteryPercentString);
-        } else if (chargeTimeMs > 0 && status != BatteryManager.BATTERY_STATUS_FULL) {
+            info.chargeLabel = context.getString(chargingLimitedResId, info.batteryPercentString);
+        } else if ((chargeTimeMs > 0 && status != BatteryManager.BATTERY_STATUS_FULL
+                && dockDefenderMode == BatteryUtils.DockDefenderMode.DISABLED)
+                || dockDefenderMode == BatteryUtils.DockDefenderMode.TEMPORARILY_BYPASSED) {
+            // Battery is charging to full
             info.remainingTimeUs = PowerUtil.convertMsToUs(chargeTimeMs);
-            final CharSequence timeString = StringUtil.formatElapsedTime(
-                    context,
-                    PowerUtil.convertUsToMs(info.remainingTimeUs),
-                    false /* withSeconds */,
+            final CharSequence timeString = StringUtil.formatElapsedTime(context,
+                    (double) PowerUtil.convertUsToMs(info.remainingTimeUs), false /* withSeconds */,
                     true /* collapseTimeUnit */);
             int resId = R.string.power_charging_duration;
-            info.remainingLabel = context.getString(
-                    R.string.power_remaining_charging_duration_only, timeString);
+            info.remainingLabel = context.getString(R.string.power_remaining_charging_duration_only,
+                    timeString);
             info.chargeLabel = context.getString(resId, info.batteryPercentString, timeString);
+        } else if (dockDefenderMode == BatteryUtils.DockDefenderMode.FUTURE_BYPASS) {
+            // Dock defender will be triggered in the future, charging will be optimized.
+            info.chargeLabel = context.getString(R.string.power_charging_future_paused,
+                    info.batteryPercentString);
         } else {
-            final String chargeStatusLabel = Utils.getBatteryStatus(context, batteryBroadcast);
+            final String chargeStatusLabel = Utils.getBatteryStatus(context, batteryBroadcast,
+                    compactStatus);
             info.remainingLabel = null;
             info.chargeLabel = info.batteryLevel == 100 ? info.batteryPercentString :
                     resources.getString(R.string.power_charging, info.batteryPercentString,

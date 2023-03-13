@@ -16,6 +16,7 @@
 
 package com.android.settings.accessibility;
 
+import static com.android.settings.accessibility.ToggleFeaturePreferenceFragment.KEY_SAVED_QS_TOOLTIP_RESHOW;
 import static com.android.settings.accessibility.ToggleFeaturePreferenceFragment.KEY_SAVED_USER_SHORTCUT_TYPE;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -37,6 +38,8 @@ import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.PopupWindow;
 
 import androidx.annotation.XmlRes;
 import androidx.appcompat.app.AlertDialog;
@@ -47,8 +50,10 @@ import androidx.test.core.app.ApplicationProvider;
 
 import com.android.settings.R;
 import com.android.settings.accessibility.AccessibilityDialogUtils.DialogType;
+import com.android.settings.accessibility.AccessibilityUtil.QuickSettingsTooltipType;
 import com.android.settings.accessibility.AccessibilityUtil.UserShortcutType;
 import com.android.settings.testutils.shadow.ShadowFragment;
+import com.android.settingslib.widget.TopIntroPreference;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +63,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadow.api.Shadow;
+import org.robolectric.shadows.ShadowApplication;
 import org.robolectric.shadows.androidx.fragment.FragmentController;
 
 /** Tests for {@link ToggleFeaturePreferenceFragment} */
@@ -68,9 +75,16 @@ public class ToggleFeaturePreferenceFragmentTest {
     private static final String PLACEHOLDER_CLASS_NAME = PLACEHOLDER_PACKAGE_NAME + ".placeholder";
     private static final ComponentName PLACEHOLDER_COMPONENT_NAME = new ComponentName(
             PLACEHOLDER_PACKAGE_NAME, PLACEHOLDER_CLASS_NAME);
+    private static final String PLACEHOLDER_TILE_CLASS_NAME =
+            PLACEHOLDER_PACKAGE_NAME + "tile.placeholder";
+    private static final ComponentName PLACEHOLDER_TILE_COMPONENT_NAME = new ComponentName(
+            PLACEHOLDER_PACKAGE_NAME, PLACEHOLDER_TILE_CLASS_NAME);
+    private static final String PLACEHOLDER_TILE_TOOLTIP_CONTENT =
+            PLACEHOLDER_PACKAGE_NAME + "tooltip_content";
     private static final String PLACEHOLDER_DIALOG_TITLE = "title";
     private static final String DEFAULT_SUMMARY = "default summary";
     private static final String DEFAULT_DESCRIPTION = "default description";
+    private static final String DEFAULT_TOP_INTRO = "default top intro";
 
     private static final String SOFTWARE_SHORTCUT_KEY =
             Settings.Secure.ACCESSIBILITY_BUTTON_TARGETS;
@@ -171,6 +185,28 @@ public class ToggleFeaturePreferenceFragmentTest {
     }
 
     @Test
+    public void dialogCheckboxClicked_hardwareType_skipTimeoutRestriction() {
+        mContext.setTheme(R.style.Theme_AppCompat);
+        final ShortcutPreference shortcutPreference = new ShortcutPreference(mContext, /* attrs= */
+                null);
+        mFragment.mComponentName = PLACEHOLDER_COMPONENT_NAME;
+        mFragment.mShortcutPreference = shortcutPreference;
+        final AlertDialog dialog = AccessibilityDialogUtils.showEditShortcutDialog(
+                mContext, DialogType.EDIT_SHORTCUT_GENERIC, PLACEHOLDER_DIALOG_TITLE,
+                mFragment::callOnAlertDialogCheckboxClicked);
+        mFragment.setupEditShortcutDialog(dialog);
+
+        final View dialogHardwareView = dialog.findViewById(R.id.hardware_shortcut);
+        final CheckBox hardwareTypeCheckBox = dialogHardwareView.findViewById(R.id.checkbox);
+        hardwareTypeCheckBox.setChecked(true);
+        dialog.getButton(DialogInterface.BUTTON_POSITIVE).callOnClick();
+        final boolean skipTimeoutRestriction = Settings.Secure.getInt(mContext.getContentResolver(),
+                Settings.Secure.SKIP_ACCESSIBILITY_SHORTCUT_DIALOG_TIMEOUT_RESTRICTION, 0) != 0;
+
+        assertThat(skipTimeoutRestriction).isTrue();
+    }
+
+    @Test
     public void setupEditShortcutDialog_shortcutPreferenceOff_checkboxIsEmptyValue() {
         mContext.setTheme(R.style.Theme_AppCompat);
         final AlertDialog dialog = AccessibilityDialogUtils.showEditShortcutDialog(
@@ -211,7 +247,7 @@ public class ToggleFeaturePreferenceFragmentTest {
 
     @Test
     @Config(shadows = ShadowFragment.class)
-    public void restoreValueFromSavedInstanceState_assignToVariable() {
+    public void restoreValueFromSavedInstanceState_assignShortcutTypeToVariable() {
         mContext.setTheme(R.style.Theme_AppCompat);
         final AlertDialog dialog = AccessibilityDialogUtils.showEditShortcutDialog(
                 mContext, DialogType.EDIT_SHORTCUT_GENERIC, PLACEHOLDER_DIALOG_TITLE,
@@ -235,6 +271,72 @@ public class ToggleFeaturePreferenceFragmentTest {
     }
 
     @Test
+    @Config(shadows = ShadowFragment.class)
+    public void onPreferenceToggledOnDisabledService_notShowTooltipView() {
+        mContext.setTheme(R.style.Theme_AppCompat);
+
+        mFragment.onPreferenceToggled(mFragment.KEY_USE_SERVICE_PREFERENCE, /* enabled= */ false);
+
+        assertThat(getLatestPopupWindow()).isNull();
+    }
+
+    @Test
+    @Config(shadows = ShadowFragment.class)
+    public void onPreferenceToggledOnEnabledService_showTooltipView() {
+        mContext.setTheme(R.style.Theme_AppCompat);
+
+        mFragment.onPreferenceToggled(mFragment.KEY_USE_SERVICE_PREFERENCE, /* enabled= */ true);
+
+        assertThat(getLatestPopupWindow().isShowing()).isTrue();
+    }
+
+    @Test
+    @Config(shadows = ShadowFragment.class)
+    public void onPreferenceToggledOnEnabledService_tooltipViewShown_notShowTooltipView() {
+        mContext.setTheme(R.style.Theme_AppCompat);
+        mFragment.onPreferenceToggled(mFragment.KEY_USE_SERVICE_PREFERENCE, /* enabled= */ true);
+        getLatestPopupWindow().dismiss();
+
+        mFragment.onPreferenceToggled(mFragment.KEY_USE_SERVICE_PREFERENCE, /* enabled= */ true);
+
+        assertThat(getLatestPopupWindow().isShowing()).isFalse();
+    }
+
+    @Test
+    @Config(shadows = ShadowFragment.class)
+    public void restoreValueFromSavedInstanceState_showTooltipView() {
+        mContext.setTheme(R.style.Theme_AppCompat);
+        mFragment.onPreferenceToggled(mFragment.KEY_USE_SERVICE_PREFERENCE, /* enabled= */ true);
+        assertThat(getLatestPopupWindow().isShowing()).isTrue();
+
+        final Bundle savedInstanceState = new Bundle();
+        savedInstanceState.putBoolean(KEY_SAVED_QS_TOOLTIP_RESHOW, /* value= */ true);
+        mFragment.onCreate(savedInstanceState);
+        mFragment.onCreateView(LayoutInflater.from(mContext), mock(ViewGroup.class), Bundle.EMPTY);
+        mFragment.onViewCreated(mFragment.getView(), savedInstanceState);
+        mFragment.onAttach(mContext);
+
+        assertThat(getLatestPopupWindow().isShowing()).isTrue();
+    }
+
+    @Test
+    public void initTopIntroPreference_hasTopIntroTitle_shouldSetAsExpectedValue() {
+        mFragment.mTopIntroTitle = DEFAULT_TOP_INTRO;
+        mFragment.initTopIntroPreference();
+
+        TopIntroPreference topIntroPreference =
+                (TopIntroPreference) mFragment.getPreferenceScreen().getPreference(/* index= */ 0);
+        assertThat(topIntroPreference.getTitle().toString()).isEqualTo(DEFAULT_TOP_INTRO);
+    }
+
+    @Test
+    public void initTopIntroPreference_topIntroTitleIsNull_shouldNotAdded() {
+        mFragment.initTopIntroPreference();
+
+        assertThat(mFragment.getPreferenceScreen().getPreferenceCount()).isEqualTo(0);
+    }
+
+    @Test
     public void createFooterPreference_shouldSetAsExpectedValue() {
         mFragment.createFooterPreference(mFragment.getPreferenceScreen(),
                 DEFAULT_SUMMARY, DEFAULT_DESCRIPTION);
@@ -243,7 +345,7 @@ public class ToggleFeaturePreferenceFragmentTest {
                 (AccessibilityFooterPreference) mFragment.getPreferenceScreen().getPreference(
                         mFragment.getPreferenceScreen().getPreferenceCount() - 1);
         assertThat(accessibilityFooterPreference.getSummary()).isEqualTo(DEFAULT_SUMMARY);
-        assertThat(accessibilityFooterPreference.isSelectable()).isEqualTo(true);
+        assertThat(accessibilityFooterPreference.isSelectable()).isEqualTo(false);
         assertThat(accessibilityFooterPreference.getOrder()).isEqualTo(Integer.MAX_VALUE - 1);
     }
 
@@ -258,12 +360,14 @@ public class ToggleFeaturePreferenceFragmentTest {
 
     private void callEmptyOnClicked(DialogInterface dialog, int which) {}
 
+    private static PopupWindow getLatestPopupWindow() {
+        final ShadowApplication shadowApplication =
+                Shadow.extract(ApplicationProvider.getApplicationContext());
+        return shadowApplication.getLatestPopupWindow();
+    }
+
     public static class TestToggleFeaturePreferenceFragment
             extends ToggleFeaturePreferenceFragment {
-
-        @Override
-        protected void onPreferenceToggled(String preferenceKey, boolean enabled) {
-        }
 
         @Override
         public int getMetricsCategory() {
@@ -273,6 +377,16 @@ public class ToggleFeaturePreferenceFragmentTest {
         @Override
         int getUserShortcutTypes() {
             return 0;
+        }
+
+        @Override
+        ComponentName getTileComponentName() {
+            return PLACEHOLDER_TILE_COMPONENT_NAME;
+        }
+
+        @Override
+        protected CharSequence getTileTooltipContent(@QuickSettingsTooltipType int type) {
+            return PLACEHOLDER_TILE_TOOLTIP_CONTENT;
         }
 
         @Override
@@ -306,5 +420,9 @@ public class ToggleFeaturePreferenceFragmentTest {
             // UI related function, do nothing in tests
         }
 
+        @Override
+        public View getView() {
+            return mock(View.class);
+        }
     }
 }

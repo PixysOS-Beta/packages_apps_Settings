@@ -25,7 +25,7 @@ import com.android.settings.biometrics.face.FaceStatusPreferenceController;
 import com.android.settings.biometrics.fingerprint.FingerprintStatusPreferenceController;
 import com.android.settings.dashboard.DashboardFragment;
 import com.android.settings.overlay.FeatureFactory;
-import com.android.settings.safetycenter.SafetyCenterStatusHolder;
+import com.android.settings.safetycenter.SafetyCenterManagerWrapper;
 import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settings.security.trustagent.TrustAgentListPreferenceController;
 import com.android.settings.widget.PreferenceCategoryController;
@@ -40,7 +40,7 @@ import java.util.List;
 public class SecuritySettings extends DashboardFragment {
 
     private static final String TAG = "SecuritySettings";
-    private static final String SECURITY_CATEGORY = "security_category";
+    protected static final String SECURITY_CATEGORY = "security_category";
 
     public static final int CHANGE_TRUST_AGENT_SETTINGS = 126;
     public static final int UNIFY_LOCK_CONFIRM_PROFILE_REQUEST = 129;
@@ -129,7 +129,12 @@ public class SecuritySettings extends DashboardFragment {
                 protected boolean isPageSearchEnabled(Context context) {
                     return !FeatureFactory.getFactory(context).getSecuritySettingsFeatureProvider()
                             .hasAlternativeSecuritySettingsFragment()
-                            && !SafetyCenterStatusHolder.get().isEnabled(context);
+                            && !SafetyCenterManagerWrapper.get().isEnabled(context);
                 }
             };
+
+    @Override
+    public Lifecycle getSettingsLifecycle() {
+        return super.getSettingsLifecycle();
+    }
 }

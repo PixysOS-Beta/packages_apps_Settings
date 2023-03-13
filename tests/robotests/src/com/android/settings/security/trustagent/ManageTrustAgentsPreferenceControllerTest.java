@@ -94,7 +94,7 @@ public class ManageTrustAgentsPreferenceControllerTest {
     @Test
     public void updateState_isSecure_noTrustAgent_shouldShowGenericSummary() {
         when(mLockPatternUtils.isSecure(anyInt())).thenReturn(true);
-        when(mTrustAgentManager.getActiveTrustAgents(mContext, mLockPatternUtils))
+        when(mTrustAgentManager.getActiveTrustAgents(mContext, mLockPatternUtils, false))
                 .thenReturn(new ArrayList<>());
 
         mController.updateState(mPreference);
@@ -107,7 +107,7 @@ public class ManageTrustAgentsPreferenceControllerTest {
     @Test
     public void updateState_isSecure_hasTrustAgent_shouldShowDetailedSummary() {
         when(mLockPatternUtils.isSecure(anyInt())).thenReturn(true);
-        when(mTrustAgentManager.getActiveTrustAgents(mContext, mLockPatternUtils))
+        when(mTrustAgentManager.getActiveTrustAgents(mContext, mLockPatternUtils, false))
                 .thenReturn(Collections.singletonList(new TrustAgentComponentInfo()));
 
         mController.updateState(mPreference);

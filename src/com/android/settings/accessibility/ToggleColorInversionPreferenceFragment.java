@@ -17,11 +17,13 @@
 package com.android.settings.accessibility;
 
 import static com.android.internal.accessibility.AccessibilityShortcutController.COLOR_INVERSION_COMPONENT_NAME;
+import static com.android.internal.accessibility.AccessibilityShortcutController.COLOR_INVERSION_TILE_COMPONENT_NAME;
 import static com.android.settings.accessibility.AccessibilityStatsLogUtils.logAccessibilityServiceEnabled;
 import static com.android.settings.accessibility.AccessibilityUtil.State.OFF;
 import static com.android.settings.accessibility.AccessibilityUtil.State.ON;
 
 import android.app.settings.SettingsEnums;
+import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.settings.R;
+import com.android.settings.accessibility.AccessibilityUtil.QuickSettingsTooltipType;
 import com.android.settings.widget.SettingsMainSwitchPreference;
 
 import java.util.ArrayList;
@@ -48,6 +51,14 @@ public class ToggleColorInversionPreferenceFragment extends ToggleFeaturePrefere
 
     @Override
     protected void onPreferenceToggled(String preferenceKey, boolean enabled) {
+        final boolean isEnabled = Settings.Secure.getInt(getContentResolver(), ENABLED, OFF) == ON;
+        if (enabled == isEnabled) {
+            return;
+        }
+
+        if (enabled) {
+            showQuickSettingsTooltipIfNeeded(QuickSettingsTooltipType.GUIDE_TO_DIRECT_USE);
+        }
         logAccessibilityServiceEnabled(mComponentName, enabled);
         Settings.Secure.putInt(getContentResolver(), ENABLED, enabled ? ON : OFF);
     }
@@ -69,8 +80,8 @@ public class ToggleColorInversionPreferenceFragment extends ToggleFeaturePrefere
     }
 
     @Override
-    protected void updateShortcutTitle(ShortcutPreference shortcutPreference) {
-        shortcutPreference.setTitle(R.string.accessibility_display_inversion_shortcut_title);
+    protected CharSequence getShortcutTitle() {
+        return getText(R.string.accessibility_display_inversion_shortcut_title);
     }
 
     @Override
@@ -79,6 +90,7 @@ public class ToggleColorInversionPreferenceFragment extends ToggleFeaturePrefere
         mComponentName = COLOR_INVERSION_COMPONENT_NAME;
         mPackageName = getText(R.string.accessibility_display_inversion_preference_title);
         mHtmlDescription = getText(R.string.accessibility_display_inversion_preference_subtitle);
+        mTopIntroTitle = getText(R.string.accessibility_display_inversion_preference_intro_text);
         mImageUri = new Uri.Builder().scheme(ContentResolver.SCHEME_ANDROID_RESOURCE)
                 .authority(getPrefContext().getPackageName())
                 .appendPath(String.valueOf(R.raw.accessibility_color_inversion_banner))
@@ -102,10 +114,10 @@ public class ToggleColorInversionPreferenceFragment extends ToggleFeaturePrefere
     private void updateFooterPreference() {
         final String title = getPrefContext().getString(
                 R.string.accessibility_color_inversion_about_title);
-        final String learnMoreContentDescription = getPrefContext().getString(
+        final String learnMoreText = getPrefContext().getString(
                 R.string.accessibility_color_inversion_footer_learn_more_content_description);
         mFooterPreferenceController.setIntroductionTitle(title);
-        mFooterPreferenceController.setupHelpLink(getHelpResource(), learnMoreContentDescription);
+        mFooterPreferenceController.setupHelpLink(getHelpResource(), learnMoreText);
         mFooterPreferenceController.displayPreference(getPreferenceScreen());
     }
 
@@ -129,6 +141,18 @@ public class ToggleColorInversionPreferenceFragment extends ToggleFeaturePrefere
     int getUserShortcutTypes() {
         return AccessibilityUtil.getUserShortcutTypesFromSettings(getPrefContext(),
                 mComponentName);
+    }
+
+    @Override
+    ComponentName getTileComponentName() {
+        return COLOR_INVERSION_TILE_COMPONENT_NAME;
+    }
+
+    @Override
+    CharSequence getTileTooltipContent(@QuickSettingsTooltipType int type) {
+        return getText(type == QuickSettingsTooltipType.GUIDE_TO_EDIT
+                ? R.string.accessibility_color_inversion_qs_tooltip_content
+                : R.string.accessibility_color_inversion_auto_added_qs_tooltip_content);
     }
 
     @Override

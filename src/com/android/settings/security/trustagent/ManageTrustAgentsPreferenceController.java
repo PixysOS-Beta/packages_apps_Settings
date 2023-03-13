@@ -66,6 +66,6 @@ public class ManageTrustAgentsPreferenceController extends BasePreferenceControl
     }
 
     private int getTrustAgentCount() {
-        return mTrustAgentManager.getActiveTrustAgents(mContext, mLockPatternUtils).size();
+        return mTrustAgentManager.getActiveTrustAgents(mContext, mLockPatternUtils, false).size();
     }
 }
