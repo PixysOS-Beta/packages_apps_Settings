@@ -30,6 +30,9 @@ import com.android.settings.overlay.FeatureFactory;
 
 /**
  * Preference for showing/hiding sensitive device controls content while the device is locked.
+ *
+ * Note that ControlsTrivialPrivacyPreferenceController depends on the preferenceKey
+ * of this controller.
  */
 public class ControlsPrivacyPreferenceController extends TogglePreferenceController {
 
@@ -59,6 +62,11 @@ public class ControlsPrivacyPreferenceController extends TogglePreferenceControl
 
     @Override
     public int getAvailabilityStatus() {
+        // hide if we should use customizable lock screen quick affordances
+        if (CustomizableLockScreenUtils.isFeatureEnabled(mContext)) {
+            return UNSUPPORTED_ON_DEVICE;
+        }
+
         // hide if lockscreen isn't secure for this user
         return isEnabled() && isSecure() ? AVAILABLE : DISABLED_DEPENDENT_SETTING;
     }

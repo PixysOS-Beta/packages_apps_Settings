@@ -16,6 +16,7 @@
 
 package com.android.settings.password;
 
+import static android.app.admin.DevicePolicyResources.Strings.Settings.SET_WORK_PROFILE_PATTERN_HEADER;
 import static android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE;
 
 import static com.android.settings.password.ChooseLockSettingsHelper.EXTRA_KEY_UNIFICATION_PROFILE_CREDENTIAL;
@@ -23,6 +24,7 @@ import static com.android.settings.password.ChooseLockSettingsHelper.EXTRA_KEY_U
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.app.settings.SettingsEnums;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +41,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -173,6 +176,7 @@ public class ChooseLockPattern extends SettingsActivity {
         ThemeHelper.trySetDynamicColor(this);
         super.onCreate(savedInstanceState);
         findViewById(R.id.content_parent).setFitsSystemWindows(false);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
     }
 
     @Override
@@ -474,15 +478,18 @@ public class ChooseLockPattern extends SettingsActivity {
         }
 
         private void updateActivityTitle() {
-            final int msg;
+            final String msg;
             if (mForFingerprint) {
-                msg = R.string.lockpassword_choose_your_pattern_header_for_fingerprint;
+                msg = getString(R.string.lockpassword_choose_your_pattern_header_for_fingerprint);
             } else if (mForFace) {
-                msg = R.string.lockpassword_choose_your_pattern_header_for_face;
+                msg = getString(R.string.lockpassword_choose_your_pattern_header_for_face);
+            } else if (mIsManagedProfile) {
+                msg = getContext().getSystemService(DevicePolicyManager.class).getResources()
+                        .getString(SET_WORK_PROFILE_PATTERN_HEADER,
+                                () -> getString(
+                                        R.string.lockpassword_choose_your_profile_pattern_header));
             } else {
-                msg = mIsManagedProfile
-                        ? R.string.lockpassword_choose_your_profile_pattern_header
-                        : R.string.lockpassword_choose_your_pattern_header;
+                msg = getString(R.string.lockpassword_choose_your_pattern_header);
             }
             getActivity().setTitle(msg);
         }
@@ -541,8 +548,6 @@ public class ChooseLockPattern extends SettingsActivity {
             mDefaultHeaderColorList = mHeaderText.getTextColors();
             mLockPatternView = (LockPatternView) view.findViewById(R.id.lockPattern);
             mLockPatternView.setOnPatternListener(mChooseNewLockPatternListener);
-            mLockPatternView.setTactileFeedbackEnabled(
-                    mLockPatternUtils.isTactileFeedbackEnabled());
             mLockPatternView.setFadePattern(false);
 
             mFooterText = (TextView) view.findViewById(R.id.footerText);

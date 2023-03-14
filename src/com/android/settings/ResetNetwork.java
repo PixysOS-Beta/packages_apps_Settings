@@ -201,7 +201,8 @@ public class ResetNetwork extends InstrumentedFragment {
                     name = record.getNumber();
                 }
                 if (TextUtils.isEmpty(name)) {
-                    name = record.getCarrierName().toString();
+                    CharSequence carrierName = record.getCarrierName();
+                    name = TextUtils.isEmpty(carrierName) ? "" : carrierName.toString();
                 }
                 if (TextUtils.isEmpty(name)) {
                     name = String.format("MCC:%s MNC:%s Slot:%s Id:%s", record.getMcc(),
@@ -238,6 +239,9 @@ public class ResetNetwork extends InstrumentedFragment {
     }
 
     private List<SubscriptionInfo> getActiveSubscriptionInfoList() {
+        if (!SubscriptionUtil.isSimHardwareVisible(getActivity())) {
+            return Collections.emptyList();
+        }
         SubscriptionManager mgr = getActivity().getSystemService(SubscriptionManager.class);
         if (mgr == null) {
             Log.w(TAG, "No SubscriptionManager");

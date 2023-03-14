@@ -18,10 +18,7 @@ package com.android.settings.applications.appinfo;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import static org.mockito.Mockito.spy;
-
 import android.content.Context;
-import android.util.FeatureFlagUtils;
 
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -37,30 +34,35 @@ import org.mockito.MockitoAnnotations;
 public class AppLocalePreferenceControllerTest {
 
     private Context mContext;
+    private boolean mCanDisplayLocaleUi;
     private AppLocalePreferenceController mController;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        mContext = spy(ApplicationProvider.getApplicationContext());
+        mContext = ApplicationProvider.getApplicationContext();
 
-        mController = spy(new AppLocalePreferenceController(mContext, "test_key"));
-        FeatureFlagUtils
-                .setEnabled(mContext, FeatureFlagUtils.SETTINGS_APP_LANGUAGE_SELECTION, true);
+        mController = new AppLocalePreferenceController(mContext, "test_key") {
+            @Override
+            boolean canDisplayLocaleUi() {
+                return mCanDisplayLocaleUi;
+            }
+        };
     }
 
     @Test
-    public void getAvailabilityStatus_featureFlagOff_shouldReturnUnavailable() {
-        FeatureFlagUtils
-                .setEnabled(mContext, FeatureFlagUtils.SETTINGS_APP_LANGUAGE_SELECTION, false);
+    public void getAvailabilityStatus_canShowUi_shouldReturnAvailable() {
+        mCanDisplayLocaleUi = true;
+
+        assertThat(mController.getAvailabilityStatus())
+                .isEqualTo(BasePreferenceController.AVAILABLE);
+    }
+
+    @Test
+    public void getAvailabilityStatus_canNotShowUi_shouldReturnUnavailable() {
+        mCanDisplayLocaleUi = false;
 
         assertThat(mController.getAvailabilityStatus())
                 .isEqualTo(BasePreferenceController.CONDITIONALLY_UNAVAILABLE);
-    }
-
-    @Test
-    public void getAvailabilityStatus_featureFlagOn_shouldReturnAvailable() {
-        assertThat(mController.getAvailabilityStatus())
-                .isEqualTo(BasePreferenceController.AVAILABLE);
     }
 }

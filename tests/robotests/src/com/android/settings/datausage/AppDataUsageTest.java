@@ -18,7 +18,7 @@ package com.android.settings.datausage;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -43,12 +43,12 @@ import android.os.Process;
 import android.telephony.SubscriptionManager;
 import android.text.format.DateUtils;
 import android.util.ArraySet;
-import android.view.View;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.settings.applications.AppInfoBase;
 import com.android.settings.testutils.FakeFeatureFactory;
@@ -96,6 +96,10 @@ public class AppDataUsageTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+
+        ShadowEntityHeaderController.setUseMock(mHeaderController);
+        when(mHeaderController.setRecyclerView(any(), any())).thenReturn(mHeaderController);
+        when(mHeaderController.setUid(anyInt())).thenReturn(mHeaderController);
     }
 
     @After
@@ -106,7 +110,10 @@ public class AppDataUsageTest {
     @Test
     @Config(shadows = ShadowFragment.class)
     public void onCreate_appUid_shouldGetAppLabelFromAppInfo() throws NameNotFoundException {
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         final FragmentActivity activity = spy(Robolectric.setupActivity(FragmentActivity.class));
         doReturn(mPackageManager).when(activity).getPackageManager();
         doReturn(activity).when(mFragment).getActivity();
@@ -136,7 +143,10 @@ public class AppDataUsageTest {
     @Test
     @Config(shadows = ShadowFragment.class)
     public void onCreate_notAppUid_shouldGetAppLabelFromUidDetailProvider() {
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         ReflectionHelpers.setField(mFragment, "mDashboardFeatureProvider",
                 FakeFeatureFactory.setupForTest().dashboardFeatureProvider);
         doReturn(Robolectric.setupActivity(FragmentActivity.class)).when(mFragment).getActivity();
@@ -163,18 +173,17 @@ public class AppDataUsageTest {
 
     @Test
     public void bindAppHeader_allWorkApps_shouldNotShowAppInfoLink() {
-        ShadowEntityHeaderController.setUseMock(mHeaderController);
-        when(mHeaderController.setRecyclerView(any(), any())).thenReturn(mHeaderController);
-        when(mHeaderController.setUid(anyInt())).thenReturn(mHeaderController);
-
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
 
         when(mFragment.getPreferenceManager())
                 .thenReturn(mock(PreferenceManager.class, RETURNS_DEEP_STUBS));
         doReturn(mock(PreferenceScreen.class)).when(mFragment).getPreferenceScreen();
         ReflectionHelpers.setField(mFragment, "mAppItem", mock(AppItem.class));
 
-        mFragment.onViewCreated(new View(RuntimeEnvironment.application), new Bundle());
+        mFragment.addEntityHeader();
 
         verify(mHeaderController).setHasAppInfoLink(false);
     }
@@ -184,7 +193,10 @@ public class AppDataUsageTest {
             throws PackageManager.NameNotFoundException {
         final int fakeUserId = 100;
 
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         final ArraySet<String> packages = new ArraySet<>();
         packages.add("pkg");
         final AppItem appItem = new AppItem(123456789);
@@ -196,16 +208,13 @@ public class AppDataUsageTest {
         when(mPackageManager.getPackageUidAsUser(anyString(), anyInt()))
                 .thenReturn(fakeUserId);
 
-        ShadowEntityHeaderController.setUseMock(mHeaderController);
-        when(mHeaderController.setRecyclerView(any(), any())).thenReturn(mHeaderController);
-        when(mHeaderController.setUid(fakeUserId)).thenReturn(mHeaderController);
         when(mHeaderController.setHasAppInfoLink(anyBoolean())).thenReturn(mHeaderController);
 
         when(mFragment.getPreferenceManager())
                 .thenReturn(mock(PreferenceManager.class, RETURNS_DEEP_STUBS));
         doReturn(mock(PreferenceScreen.class)).when(mFragment).getPreferenceScreen();
 
-        mFragment.onViewCreated(new View(RuntimeEnvironment.application), new Bundle());
+        mFragment.addEntityHeader();
 
         verify(mHeaderController).setHasAppInfoLink(true);
         verify(mHeaderController).setUid(fakeUserId);
@@ -213,7 +222,10 @@ public class AppDataUsageTest {
 
     @Test
     public void changePreference_backgroundData_shouldUpdateUI() {
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         final AppItem appItem = new AppItem(123456789);
         final RestrictedSwitchPreference pref = mock(RestrictedSwitchPreference.class);
         final DataSaverBackend dataSaverBackend = mock(DataSaverBackend.class);
@@ -230,7 +242,10 @@ public class AppDataUsageTest {
 
     @Test
     public void updatePrefs_restrictedByAdmin_shouldDisablePreference() {
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         final int testUid = 123123;
         final AppItem appItem = new AppItem(testUid);
         final RestrictedSwitchPreference restrictBackgroundPref
@@ -244,6 +259,7 @@ public class AppDataUsageTest {
         ReflectionHelpers.setField(mFragment, "mUnrestrictedData", unrestrictedDataPref);
         ReflectionHelpers.setField(mFragment, "mDataSaverBackend", dataSaverBackend);
         ReflectionHelpers.setField(mFragment.services, "mPolicyManager", networkPolicyManager);
+        when(mFragment.getListView()).thenReturn(mock(RecyclerView.class));
 
         ShadowRestrictedLockUtilsInternal.setRestricted(true);
         doReturn(NetworkPolicyManager.POLICY_NONE).when(networkPolicyManager)
@@ -257,7 +273,10 @@ public class AppDataUsageTest {
 
     @Test
     public void bindData_noAppUsageData_shouldHideCycleSpinner() {
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         final SpinnerPreference cycle = mock(SpinnerPreference.class);
         ReflectionHelpers.setField(mFragment, "mCycle", cycle);
         final Preference preference = mock(Preference.class);
@@ -268,12 +287,15 @@ public class AppDataUsageTest {
 
         mFragment.bindData(0 /* position */);
 
-        verify(cycle).setVisible(false);
+        verify(cycle).setHasCycles(false);
     }
 
     @Test
     public void bindData_hasAppUsageData_shouldShowCycleSpinnerAndUpdateUsageSummary() {
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         final Context context = RuntimeEnvironment.application;
         ReflectionHelpers.setField(mFragment, "mContext", context);
         final long backgroundBytes = 1234L;
@@ -293,7 +315,7 @@ public class AppDataUsageTest {
 
         mFragment.bindData(0 /* position */);
 
-        verify(cycle).setVisible(true);
+        verify(cycle).setHasCycles(true);
         verify(totalPref).setSummary(
                 DataUsageUtils.formatDataUsage(context, backgroundBytes + foregroundBytes));
         verify(backgroundPref).setSummary(DataUsageUtils.formatDataUsage(context, backgroundBytes));
@@ -302,10 +324,14 @@ public class AppDataUsageTest {
 
     @Test
     public void onCreateLoader_categoryApp_shouldQueryDataUsageUsingAppKey() {
-        mFragment = new AppDataUsage();
+        mFragment = new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        };
         final Context context = RuntimeEnvironment.application;
         final int testUid = 123123;
         final AppItem appItem = new AppItem(testUid);
+        appItem.addUid(testUid);
         appItem.category = AppItem.CATEGORY_APP;
         ReflectionHelpers.setField(mFragment, "mContext", context);
         ReflectionHelpers.setField(mFragment, "mAppItem", appItem);
@@ -324,7 +350,10 @@ public class AppDataUsageTest {
 
     @Test
     public void onCreateLoader_categoryUser_shouldQueryDataUsageUsingAssociatedUids() {
-        mFragment = new AppDataUsage();
+        mFragment = new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        };
         final Context context = RuntimeEnvironment.application;
         final int testUserId = 11;
         final AppItem appItem = new AppItem(testUserId);
@@ -361,7 +390,10 @@ public class AppDataUsageTest {
         appItem.category = AppItem.CATEGORY_APP;
         appItem.addUid(uid);
 
-        mFragment = new AppDataUsage();
+        mFragment = new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        };
         ReflectionHelpers.setField(mFragment, "mContext", RuntimeEnvironment.application);
         ReflectionHelpers.setField(mFragment, "mCycles", testCycles);
         ReflectionHelpers.setField(mFragment, "mAppItem", appItem);
@@ -394,7 +426,10 @@ public class AppDataUsageTest {
         builder.setStartTime(tenDaysAgo).setEndTime(now).setTotalUsage(1234L);
         data.add(builder.build());
 
-        mFragment = new AppDataUsage();
+        mFragment = new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        };
         ReflectionHelpers.setField(mFragment, "mContext", RuntimeEnvironment.application);
         ReflectionHelpers.setField(mFragment, "mCycleAdapter", mock(CycleAdapter.class));
         ReflectionHelpers.setField(mFragment, "mSelectedCycle", tenDaysAgo);
@@ -421,7 +456,10 @@ public class AppDataUsageTest {
         ShadowDataUsageUtils.HAS_SIM = false;
         ShadowSubscriptionManager.setDefaultDataSubscriptionId(
                 SubscriptionManager.INVALID_SUBSCRIPTION_ID);
-        mFragment = spy(new AppDataUsage());
+        mFragment = spy(new AppDataUsage() {
+            @Override
+            public boolean isSimHardwareVisible(Context context) { return true; }
+        });
         doReturn(Robolectric.setupActivity(FragmentActivity.class)).when(mFragment).getActivity();
         doReturn(RuntimeEnvironment.application).when(mFragment).getContext();
         final UidDetailProvider uidDetailProvider = mock(UidDetailProvider.class);
@@ -438,8 +476,7 @@ public class AppDataUsageTest {
 
         assertThat(mFragment.mTemplate.getMatchRule())
                 .isEqualTo(NetworkTemplate.MATCH_WIFI);
-        assertNull(mFragment.mTemplate.getSubscriberId());
-        assertThat(mFragment.mTemplate.getNetworkId())
-                .isEqualTo(NetworkTemplate.WIFI_NETWORKID_ALL);
+        assertTrue(mFragment.mTemplate.getSubscriberIds().isEmpty());
+        assertTrue(mFragment.mTemplate.getWifiNetworkKeys().isEmpty());
     }
 }

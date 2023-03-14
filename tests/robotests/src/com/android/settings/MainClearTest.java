@@ -55,7 +55,6 @@ import com.android.settingslib.development.DevelopmentSettingsEnabler;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -103,7 +102,10 @@ public class MainClearTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        mMainClear = spy(new MainClear());
+        mMainClear = spy(new MainClear() {
+            @Override
+            boolean showAnySubscriptionInfo(Context context) { return true; }
+        });
         mActivity = Robolectric.setupActivity(FragmentActivity.class);
         mShadowActivity = Shadows.shadowOf(mActivity);
         UserManager userManager = mActivity.getSystemService(UserManager.class);
@@ -209,7 +211,6 @@ public class MainClearTest {
     }
 
     @Test
-    @Ignore
     public void testShowWipeEuicc_euiccEnabled_unprovisioned() {
         prepareEuiccState(
                 true /* isEuiccEnabled */,
@@ -228,7 +229,6 @@ public class MainClearTest {
     }
 
     @Test
-    @Ignore
     public void testShowWipeEuicc_developerMode_unprovisioned() {
         prepareEuiccState(
                 true /* isEuiccEnabled */,

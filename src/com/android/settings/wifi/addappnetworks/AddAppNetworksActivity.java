@@ -18,11 +18,14 @@ package com.android.settings.wifi.addappnetworks;
 
 import android.app.ActivityManager;
 import android.app.IActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.RemoteException;
+import android.os.UserManager;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Window;
@@ -56,8 +59,6 @@ public class AddAppNetworksActivity extends FragmentActivity {
     final Bundle mBundle = new Bundle();
     @VisibleForTesting
     IActivityManager mActivityManager = ActivityManager.getService();
-    @VisibleForTesting
-    boolean mIsAddWifiConfigAllow;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,8 +75,6 @@ public class AddAppNetworksActivity extends FragmentActivity {
         window.setGravity(Gravity.BOTTOM);
         window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
-
-        mIsAddWifiConfigAllow = WifiEnterpriseRestrictionUtils.isAddWifiConfigAllowed(this);
     }
 
     @Override
@@ -89,8 +88,14 @@ public class AddAppNetworksActivity extends FragmentActivity {
     }
 
     @VisibleForTesting
-    protected boolean showAddNetworksFragment() {
-        if (!mIsAddWifiConfigAllow) {
+    boolean showAddNetworksFragment() {
+        if (isGuestUser(getApplicationContext())) {
+            Log.e(TAG, "Guest user is not allowed to configure Wi-Fi!");
+            EventLog.writeEvent(0x534e4554, "224772678", -1 /* UID */, "User is a guest");
+            return false;
+        }
+
+        if (!isAddWifiConfigAllow()) {
             Log.d(TAG, "Not allowed by Enterprise Restriction");
             return false;
         }
@@ -128,5 +133,17 @@ public class AddAppNetworksActivity extends FragmentActivity {
             return null;
         }
         return packageName;
+    }
+
+    @VisibleForTesting
+    boolean isAddWifiConfigAllow() {
+        return WifiEnterpriseRestrictionUtils.isAddWifiConfigAllowed(this);
+    }
+
+    private static boolean isGuestUser(Context context) {
+        if (context == null) return false;
+        final UserManager userManager = context.getSystemService(UserManager.class);
+        if (userManager == null) return false;
+        return userManager.isGuestUser();
     }
 }

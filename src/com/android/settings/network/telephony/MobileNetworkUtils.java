@@ -75,6 +75,7 @@ import com.android.settings.R;
 import com.android.settings.Utils;
 import com.android.settings.core.BasePreferenceController;
 import com.android.settings.core.SubSettingLauncher;
+import com.android.settings.network.CarrierConfigCache;
 import com.android.settings.network.SubscriptionUtil;
 import com.android.settings.network.ims.WifiCallingQueryImsState;
 import com.android.settings.network.telephony.TelephonyConstants.TelephonyManagerConstants;
@@ -84,7 +85,9 @@ import com.android.settingslib.graph.SignalDrawable;
 import com.android.settingslib.utils.ThreadUtils;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -204,13 +207,12 @@ public class MobileNetworkUtils {
      * should be shown to the user, false if the option should be hidden.
      */
     public static boolean isContactDiscoveryVisible(Context context, int subId) {
-        CarrierConfigManager carrierConfigManager = context.getSystemService(
-                CarrierConfigManager.class);
-        if (carrierConfigManager == null) {
+        CarrierConfigCache carrierConfigCache = CarrierConfigCache.getInstance(context);
+        if (!carrierConfigCache.hasCarrierConfigManager()) {
             Log.w(TAG, "isContactDiscoveryVisible: Could not resolve carrier config");
             return false;
         }
-        PersistableBundle bundle = carrierConfigManager.getConfigForSubId(subId);
+        PersistableBundle bundle = carrierConfigCache.getConfigForSubId(subId);
         return bundle.getBoolean(
                 CarrierConfigManager.KEY_USE_RCS_PRESENCE_BOOL, false /*default*/)
                 || bundle.getBoolean(CarrierConfigManager.Ims.KEY_RCS_BULK_CAPABILITY_EXCHANGE_BOOL,
@@ -261,6 +263,9 @@ public class MobileNetworkUtils {
      * the user has enabled development mode.
      */
     public static boolean showEuiccSettings(Context context) {
+        if (!SubscriptionUtil.isSimHardwareVisible(context)) {
+            return false;
+        }
         long timeForAccess = SystemClock.elapsedRealtime();
         try {
             Boolean isShow = ((Future<Boolean>) ThreadUtils.postOnBackgroundThread(() -> {
@@ -358,9 +363,8 @@ public class MobileNetworkUtils {
         if (subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID) {
             return false;
         }
-
-        final PersistableBundle carrierConfig = context.getSystemService(
-                CarrierConfigManager.class).getConfigForSubId(subId);
+        final PersistableBundle carrierConfig =
+                CarrierConfigCache.getInstance(context).getConfigForSubId(subId);
         if (carrierConfig != null
                 && !carrierConfig.getBoolean(
                 CarrierConfigManager.KEY_HIDE_CARRIER_NETWORK_SETTINGS_BOOL)
@@ -424,8 +428,8 @@ public class MobileNetworkUtils {
     }
 
     private static boolean isGsmBasicOptions(Context context, int subId) {
-        final PersistableBundle carrierConfig = context.getSystemService(
-                CarrierConfigManager.class).getConfigForSubId(subId);
+        final PersistableBundle carrierConfig =
+                CarrierConfigCache.getInstance(context).getConfigForSubId(subId);
         if (carrierConfig != null
                 && !carrierConfig.getBoolean(
                 CarrierConfigManager.KEY_HIDE_CARRIER_NETWORK_SETTINGS_BOOL)
@@ -447,8 +451,8 @@ public class MobileNetworkUtils {
      * settings
      */
     public static boolean isWorldMode(Context context, int subId) {
-        final PersistableBundle carrierConfig = context.getSystemService(
-                CarrierConfigManager.class).getConfigForSubId(subId);
+        final PersistableBundle carrierConfig =
+                CarrierConfigCache.getInstance(context).getConfigForSubId(subId);
         return carrierConfig == null
                 ? false
                 : carrierConfig.getBoolean(CarrierConfigManager.KEY_WORLD_MODE_ENABLED_BOOL);
@@ -460,8 +464,8 @@ public class MobileNetworkUtils {
     public static boolean shouldDisplayNetworkSelectOptions(Context context, int subId) {
         final TelephonyManager telephonyManager = context.getSystemService(TelephonyManager.class)
                 .createForSubscriptionId(subId);
-        final PersistableBundle carrierConfig = context.getSystemService(
-                CarrierConfigManager.class).getConfigForSubId(subId);
+        final PersistableBundle carrierConfig =
+                CarrierConfigCache.getInstance(context).getConfigForSubId(subId);
         if (subId == SubscriptionManager.INVALID_SUBSCRIPTION_ID
                 || carrierConfig == null
                 || !carrierConfig.getBoolean(
@@ -502,8 +506,7 @@ public class MobileNetworkUtils {
 
     //TODO(b/117651939): move it to telephony
     private static boolean isTdscdmaSupported(Context context, TelephonyManager telephonyManager) {
-        final PersistableBundle carrierConfig = context.getSystemService(
-                CarrierConfigManager.class).getConfig();
+        final PersistableBundle carrierConfig = CarrierConfigCache.getInstance(context).getConfig();
 
         if (carrierConfig == null) {
             return false;
@@ -713,15 +716,17 @@ public class MobileNetworkUtils {
         final TelephonyManager tm =
                 (TelephonyManager) context.getSystemService(TelephonyManager.class);
 
+        Set<String> countrySet = new HashSet<>();
         for (int i = 0; i < tm.getPhoneCount(); i++) {
             String countryCode = tm.getNetworkCountryIso(i);
-            if (em.isSupportedCountry(countryCode)) {
-                Log.i(TAG, "isCurrentCountrySupported: eSIM is supported in " + countryCode);
-                return true;
+            if (!TextUtils.isEmpty(countryCode)) {
+                countrySet.add(countryCode);
             }
         }
-        Log.i(TAG, "isCurrentCountrySupported: eSIM is not supported in the current country.");
-        return false;
+        boolean isSupported = countrySet.stream().anyMatch(em::isSupportedCountry);
+        Log.i(TAG, "isCurrentCountrySupported countryCodes: " + countrySet
+                + " eSIMSupported: " + isSupported);
+        return isSupported;
     }
 
     /**

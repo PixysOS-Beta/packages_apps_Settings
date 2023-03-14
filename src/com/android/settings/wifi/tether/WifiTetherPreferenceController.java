@@ -16,9 +16,10 @@
 
 package com.android.settings.wifi.tether;
 
+import static com.android.settings.wifi.WifiUtils.canShowWifiHotspot;
+
 import android.annotation.NonNull;
 import android.content.Context;
-import android.net.TetheringManager;
 import android.net.wifi.SoftApConfiguration;
 import android.net.wifi.WifiClient;
 import android.net.wifi.WifiManager;
@@ -37,6 +38,7 @@ import com.android.settingslib.core.lifecycle.LifecycleObserver;
 import com.android.settingslib.core.lifecycle.events.OnStart;
 import com.android.settingslib.core.lifecycle.events.OnStop;
 import com.android.settingslib.wifi.WifiEnterpriseRestrictionUtils;
+import com.android.settingslib.wifi.WifiUtils;
 
 import java.util.List;
 
@@ -45,12 +47,8 @@ public class WifiTetherPreferenceController extends AbstractPreferenceController
 
     private static final String WIFI_TETHER_SETTINGS = "wifi_tether";
 
-    private final TetheringManager mTetheringManager;
-    private final String[] mWifiRegexs;
-    private final WifiManager mWifiManager;
-    private final Lifecycle mLifecycle;
-    @VisibleForTesting
-    boolean mIsWifiTetheringAllow;
+    private WifiManager mWifiManager;
+    private boolean mIsWifiTetheringAllow;
     private int mSoftApState;
     @VisibleForTesting
     Preference mPreference;
@@ -58,18 +56,25 @@ public class WifiTetherPreferenceController extends AbstractPreferenceController
     WifiTetherSoftApManager mWifiTetherSoftApManager;
 
     public WifiTetherPreferenceController(Context context, Lifecycle lifecycle) {
-        this(context, lifecycle, true /* initSoftApManager */);
+        this(context, lifecycle,
+                context.getApplicationContext().getSystemService(WifiManager.class),
+                true /* initSoftApManager */,
+                WifiEnterpriseRestrictionUtils.isWifiTetheringAllowed(context));
     }
 
     @VisibleForTesting
-    WifiTetherPreferenceController(Context context, Lifecycle lifecycle,
-            boolean initSoftApManager) {
+    WifiTetherPreferenceController(
+            Context context,
+            Lifecycle lifecycle,
+            WifiManager wifiManager,
+            boolean initSoftApManager,
+            boolean isWifiTetheringAllow) {
         super(context);
-        mTetheringManager = context.getSystemService(TetheringManager.class);
-        mWifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        mWifiRegexs = mTetheringManager.getTetherableWifiRegexs();
-        mIsWifiTetheringAllow = WifiEnterpriseRestrictionUtils.isWifiTetheringAllowed(context);
-        mLifecycle = lifecycle;
+        mIsWifiTetheringAllow = isWifiTetheringAllow;
+        if (!isWifiTetheringAllow) return;
+
+        mWifiManager = wifiManager;
+
         if (lifecycle != null) {
             lifecycle.addObserver(this);
         }
@@ -80,9 +85,7 @@ public class WifiTetherPreferenceController extends AbstractPreferenceController
 
     @Override
     public boolean isAvailable() {
-        return mWifiRegexs != null
-                && mWifiRegexs.length != 0
-                && !Utils.isMonkeyRunning();
+        return canShowWifiHotspot(mContext) && !Utils.isMonkeyRunning();
     }
 
     @Override
@@ -93,7 +96,10 @@ public class WifiTetherPreferenceController extends AbstractPreferenceController
             // unavailable
             return;
         }
-        mPreference.setEnabled(mIsWifiTetheringAllow);
+        if (!mIsWifiTetheringAllow && mPreference.isEnabled()) {
+            mPreference.setEnabled(false);
+            mPreference.setSummary(R.string.not_allowed_by_ent);
+        }
     }
 
     @Override
@@ -136,9 +142,9 @@ public class WifiTetherPreferenceController extends AbstractPreferenceController
                         if (mPreference != null
                                 && mSoftApState == WifiManager.WIFI_AP_STATE_ENABLED) {
                             // Only show the number of clients when state is on
-                            mPreference.setSummary(mContext.getResources().getQuantityString(
-                                    R.plurals.wifi_tether_connected_summary, clients.size(),
-                                    clients.size()));
+                            mPreference.setSummary(
+                                    WifiUtils.getWifiTetherSummaryForConnectedDevices(mContext,
+                                            clients.size()));
                         }
                     }
                 });

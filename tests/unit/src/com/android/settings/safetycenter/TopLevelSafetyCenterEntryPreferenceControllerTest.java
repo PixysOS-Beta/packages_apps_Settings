@@ -22,12 +22,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.provider.DeviceConfig;
-import android.provider.Settings;
 
 import androidx.preference.Preference;
 import androidx.test.core.app.ApplicationProvider;
@@ -51,11 +50,15 @@ public class TopLevelSafetyCenterEntryPreferenceControllerTest {
     private Preference mPreference;
 
     @Mock
+    private SafetyCenterManagerWrapper mSafetyCenterManagerWrapper;
+
+    @Mock
     private Context mContext;
 
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
+        SafetyCenterManagerWrapper.sInstance = mSafetyCenterManagerWrapper;
 
         mPreference = new Preference(ApplicationProvider.getApplicationContext());
         mPreference.setKey(PREFERENCE_KEY);
@@ -63,14 +66,11 @@ public class TopLevelSafetyCenterEntryPreferenceControllerTest {
         doNothing().when(mContext).startActivity(any(Intent.class));
         mTopLevelSafetyCenterEntryPreferenceController =
                 new TopLevelSafetyCenterEntryPreferenceController(mContext, PREFERENCE_KEY);
-        DeviceConfig.resetToDefaults(Settings.RESET_MODE_PACKAGE_DEFAULTS,
-                DeviceConfig.NAMESPACE_PRIVACY);
     }
 
     @After
     public void tearDown() {
-        DeviceConfig.resetToDefaults(Settings.RESET_MODE_PACKAGE_DEFAULTS,
-                DeviceConfig.NAMESPACE_PRIVACY);
+        SafetyCenterManagerWrapper.sInstance = null;
     }
 
     @Test
@@ -110,11 +110,7 @@ public class TopLevelSafetyCenterEntryPreferenceControllerTest {
 
     @Test
     public void getAvailabilityStatus_whenSafetyCenterDisabled_returnsUnavailable() {
-        DeviceConfig.setProperty(
-                DeviceConfig.NAMESPACE_PRIVACY,
-                SafetyCenterStatus.SAFETY_CENTER_IS_ENABLED,
-                /* value = */ Boolean.toString(false),
-                /* makeDefault = */ false);
+        when(mSafetyCenterManagerWrapper.isEnabled(any(Context.class))).thenReturn(false);
 
         assertThat(mTopLevelSafetyCenterEntryPreferenceController.getAvailabilityStatus())
                 .isEqualTo(TopLevelSafetyCenterEntryPreferenceController.CONDITIONALLY_UNAVAILABLE);
@@ -122,11 +118,7 @@ public class TopLevelSafetyCenterEntryPreferenceControllerTest {
 
     @Test
     public void getAvailabilityStatus_whenSafetyCenterEnabled_returnsAvailable() {
-        DeviceConfig.setProperty(
-                DeviceConfig.NAMESPACE_PRIVACY,
-                SafetyCenterStatus.SAFETY_CENTER_IS_ENABLED,
-                /* value = */ Boolean.toString(true),
-                /* makeDefault = */ false);
+        when(mSafetyCenterManagerWrapper.isEnabled(any(Context.class))).thenReturn(true);
 
         assertThat(mTopLevelSafetyCenterEntryPreferenceController.getAvailabilityStatus())
                 .isEqualTo(TopLevelSafetyCenterEntryPreferenceController.AVAILABLE);

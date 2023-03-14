@@ -23,7 +23,6 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.fragment.app.FragmentActivity;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,14 +42,17 @@ public class TopLevelHighlightMixin implements Parcelable, DialogInterface.OnSho
     private String mHiddenKey;
     private DialogInterface mDialog;
     private HighlightableTopLevelPreferenceAdapter mTopLevelAdapter;
+    private boolean mActivityEmbedded;
 
-    public TopLevelHighlightMixin() {
+    public TopLevelHighlightMixin(boolean activityEmbedded) {
+        mActivityEmbedded = activityEmbedded;
     }
 
     public TopLevelHighlightMixin(Parcel source) {
         mCurrentKey = source.readString();
         mPreviousKey = source.readString();
         mHiddenKey = source.readString();
+        mActivityEmbedded = source.readBoolean();
     }
 
     @Override
@@ -58,6 +60,7 @@ public class TopLevelHighlightMixin implements Parcelable, DialogInterface.OnSho
         dest.writeString(mCurrentKey);
         dest.writeString(mPreviousKey);
         dest.writeString(mHiddenKey);
+        dest.writeBoolean(mActivityEmbedded);
     }
 
     @Override
@@ -96,16 +99,29 @@ public class TopLevelHighlightMixin implements Parcelable, DialogInterface.OnSho
         }
     }
 
+    void setActivityEmbedded(boolean activityEmbedded) {
+        mActivityEmbedded = activityEmbedded;
+    }
+
+    boolean isActivityEmbedded() {
+        return mActivityEmbedded;
+    }
+
     RecyclerView.Adapter onCreateAdapter(TopLevelSettings topLevelSettings,
-            PreferenceScreen preferenceScreen) {
+            PreferenceScreen preferenceScreen, boolean scrollNeeded) {
         if (TextUtils.isEmpty(mCurrentKey)) {
             mCurrentKey = getHighlightPrefKeyFromArguments(topLevelSettings.getArguments());
         }
 
         Log.d(TAG, "onCreateAdapter, pref key: " + mCurrentKey);
+
+        // Remove the animator to avoid a RecyclerView crash.
+        RecyclerView recyclerView = topLevelSettings.getListView();
+        recyclerView.setItemAnimator(null);
+
         mTopLevelAdapter = new HighlightableTopLevelPreferenceAdapter(
                 (SettingsHomepageActivity) topLevelSettings.getActivity(), preferenceScreen,
-                topLevelSettings.getListView(), mCurrentKey);
+                recyclerView, mCurrentKey, scrollNeeded);
         return mTopLevelAdapter;
     }
 
@@ -129,7 +145,11 @@ public class TopLevelHighlightMixin implements Parcelable, DialogInterface.OnSho
         }
     }
 
-    void highlightPreferenceIfNeeded(FragmentActivity activity) {
+    String getHighlightPreferenceKey() {
+        return mCurrentKey;
+    }
+
+    void highlightPreferenceIfNeeded() {
         if (mTopLevelAdapter != null) {
             mTopLevelAdapter.requestHighlight();
         }
