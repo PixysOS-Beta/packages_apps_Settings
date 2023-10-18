@@ -372,7 +372,7 @@ public class SettingsGateway {
             NfcAndPaymentFragment.class.getName(),
             ColorAndMotionFragment.class.getName(),
             LongBackgroundTasksDetails.class.getName(),
-            RegionalPreferencesEntriesFragment.class.getName()
+            RegionalPreferencesEntriesFragment.class.getName(),
             LabSettings.class.getName()            
     };
 
