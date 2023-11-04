@@ -41,7 +41,7 @@
         android:key="bg_color"
         android:title="@string/bg_color_title"
         android:summary="@string/bg_color_summary" />
-
+<!--
     <com.pixys.support.preference.CustomSeekBarPreference
         android:key="luminance_factor"
         android:title="@string/luminance_factor_title"
@@ -69,7 +69,7 @@
         android:title="@string/tint_background_title"
         android:summary="@string/tint_background_summary"
         android:defaultValue="false" />
-
+-->
     </PreferenceCategory>
 
     <PreferenceCategory
