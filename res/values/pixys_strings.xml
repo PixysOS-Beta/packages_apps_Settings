@@ -279,4 +279,9 @@
         island notification to reject phone calls.\n3. Long press island notification to expand the island 
         notification preview.
     </string>
+
+    <!-- WiFi Standard icon --> 
+    <string name="wifi_standard_icon_title">WiFi standard</string>
+    <string name="wifi_standard_icon_summary">Display WiFi standard next to WiFi signal</string>
+
 </resources>

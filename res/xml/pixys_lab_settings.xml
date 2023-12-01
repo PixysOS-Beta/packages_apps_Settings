@@ -51,4 +51,10 @@
             android:summary="@string/island_notification_summary"
             android:fragment="com.android.settings.custom.fragment.notifications.IslandSettings" />
 
+    <com.pixys.support.preference.SystemSettingSwitchPreference 
+        android:key="wifi_standard_icon" 
+        android:title="@string/wifi_standard_icon_title" 
+        android:summary="@string/wifi_standard_icon_summary"
+        android:defaultValue="false" />
+
 </PreferenceScreen>
