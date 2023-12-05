@@ -20,7 +20,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="@string/island_notification_title">
 
-    <com.android.settings.custom.preference.SystemSettingSwitchPreference
+    <com.pixys.support.preference.SystemSettingSwitchPreference
         android:key="island_notification"
         android:title="@string/island_notification_title"
         android:summary="@string/island_notification_summary"

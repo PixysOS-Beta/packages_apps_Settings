@@ -42,7 +42,7 @@ public class IslandSettings extends SettingsPreferenceFragment {
 
     @Override
     public int getMetricsCategory() {
-        return MetricsProto.MetricsEvent.CUSTOM_SETTINGS;
+        return MetricsProto.MetricsEvent.PIXYS;
     }
 
     /**
