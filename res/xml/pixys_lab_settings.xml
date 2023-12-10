@@ -32,12 +32,11 @@
             android:defaultValue="false" />
 
         <!-- Unlimited google photos storage -->
-   <!--        <com.pixys.support.preference.SystemPropertySwitchPreference
+        <com.pixys.support.preference.SystemPropertySwitchPreference
             android:key="persist.sys.pixelprops.gphotos"
             android:title="@string/use_photos_spoof_title"
             android:summary="@string/use_photos_spoof_summary"
-            android:defaultValue="false" />    
- -->
+            android:defaultValue="false" />
 
    <com.pixys.support.preference.SecureSettingSwitchPreference
         android:key="window_ignore_secure"
