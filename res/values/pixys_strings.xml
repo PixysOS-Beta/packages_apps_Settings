@@ -328,4 +328,8 @@
     <string name="app_lock_timeout_5min">5 minutes</string>
     <string name="app_lock_timeout_10min">10 minutes</string>
     <string name="app_lock_timeout_30min">30 minutes</string>
+
+    <string name="use_velvet_spoof_title">Spoof Google app for extra features</string>
+    <string name="use_velvet_spoof_summary">Spoof Pixel 8 Pro for the Google app.</string>
+
 </resources>
