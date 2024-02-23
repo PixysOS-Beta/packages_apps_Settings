@@ -63,7 +63,6 @@ public class BatteryHeaderPreferenceController extends BasePreferenceController
     private Lifecycle mLifecycle;
     private BatteryTip mBatteryTip;
     private final PowerManager mPowerManager;
-    private int mChargerCounter = 0;
 
     public BatteryHeaderPreferenceController(Context context, String key) {
         super(context, key);
@@ -149,9 +148,6 @@ public class BatteryHeaderPreferenceController extends BasePreferenceController
         mBatteryUsageProgressBarPref.setUsageSummary(
                 formatBatteryPercentageText(info.batteryLevel));
         mBatteryUsageProgressBarPref.setPercent(info.batteryLevel, BATTERY_MAX_LEVEL);
-        mBatteryUsageProgressBarPref.setTotalSummary(
-                formatBatteryChargeCounterText(mChargerCounter));
-
     }
 
     /**
@@ -169,12 +165,17 @@ public class BatteryHeaderPreferenceController extends BasePreferenceController
         final int batteryLevel = Utils.getBatteryLevel(batteryBroadcast);
         final boolean discharging =
                 batteryBroadcast.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) == 0;
-        mChargerCounter = batteryBroadcast.getIntExtra(BatteryManager.EXTRA_CHARGE_COUNTER, 0);
+        final int chargeCounterUah =
+                batteryBroadcast.getIntExtra(BatteryManager.EXTRA_CHARGE_COUNTER, -1);
 
         mBatteryUsageProgressBarPref.setUsageSummary(formatBatteryPercentageText(batteryLevel));
         mBatteryUsageProgressBarPref.setPercent(batteryLevel, BATTERY_MAX_LEVEL);
-        mBatteryUsageProgressBarPref.setTotalSummary(
-                formatBatteryChargeCounterText(mChargerCounter));
+
+        if (chargeCounterUah != -1) {
+            int chargeCounter = chargeCounterUah / 1_000;
+            mBatteryUsageProgressBarPref.setTotalSummary(
+                    formatBatteryChargeCounterText(chargeCounter));
+        }
     }
 
     /**
