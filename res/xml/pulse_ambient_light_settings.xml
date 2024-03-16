@@ -29,11 +29,11 @@
     <PreferenceCategory
         android:title="@string/pulse_ambient_light_color">
 
-        <com.android.settingslib.widget.RadioButtonPreference
+        <com.android.settingslib.widget.SelectorWithWidgetPreference
             android:key="ambient_notification_light_automatic"
             android:title="@string/ambient_notification_light_color_automatic_title" />
 
-        <com.android.settingslib.widget.RadioButtonPreference
+        <com.android.settingslib.widget.SelectorWithWidgetPreference
             android:key="ambient_notification_light_accent"
             android:title="@string/ambient_notification_light_accent_title" />
     </PreferenceCategory>

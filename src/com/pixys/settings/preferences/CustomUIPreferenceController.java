@@ -16,7 +16,7 @@ package com.pixys.settings.preferences;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.Settings;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.Preference;
 
 import com.android.internal.util.pixys.PixysUtils;
@@ -45,7 +45,7 @@ public class CustomUIPreferenceController extends AbstractPreferenceController i
     public void updateState(Preference preference) {
         int customUIToggleValue = Settings.System.getInt(mContext.getContentResolver(),
                 CUSTOM_UI_TOGGLE, 0);
-        ((SwitchPreference) preference).setChecked(customUIToggleValue != 0);
+        ((SwitchPreferenceCompat) preference).setChecked(customUIToggleValue != 0);
     }
 
     @Override
