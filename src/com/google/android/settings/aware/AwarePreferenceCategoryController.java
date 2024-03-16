@@ -12,7 +12,7 @@ public class AwarePreferenceCategoryController extends PreferenceCategoryControl
 
     public AwarePreferenceCategoryController(Context context, String str) {
         super(context, str);
-        mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public int getAvailabilityStatus() {

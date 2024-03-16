@@ -9,7 +9,9 @@ import com.android.settings.R;
 import com.android.settings.dashboard.DashboardFragment;
 import com.android.settings.overlay.FeatureFactory;
 import com.android.settings.search.BaseSearchIndexProvider;
-import com.android.settings.search.Indexable;
+
+import com.android.settingslib.search.SearchIndexable;
+import com.android.settingslib.search.Indexable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +25,7 @@ public class AwareSettings extends DashboardFragment {
     }
 
     public int getMetricsCategory() {
-        return MetricsProto.MetricsEvent.DIRTYTWEAKS;
+        return MetricsProto.MetricsEvent.PIXYS;
     }
 
     public int getPreferenceScreenResId() {

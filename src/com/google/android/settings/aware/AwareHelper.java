@@ -55,7 +55,7 @@ public class AwareHelper {
     public AwareHelper(Context context) {
         mContext = context;
         mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
-        mFeatureProvider = FeatureFactory.getFactory(mContext).getAwareFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public boolean isGestureConfigurable() {

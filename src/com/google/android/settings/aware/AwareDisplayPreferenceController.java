@@ -39,6 +39,11 @@ public class AwareDisplayPreferenceController extends BasePreferenceController
         return 3;
     }
 
+    @Override 
+     public int getSliceHighlightMenuRes() { 
+      return R.string.menu_key_display;
+    }
+
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
         mPreference = preferenceScreen.findPreference(getPreferenceKey());

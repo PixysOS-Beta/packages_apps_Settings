@@ -23,7 +23,7 @@ public class AwareBasePreferenceController extends BasePreferenceController
     public AwareBasePreferenceController(Context context, String str) {
         super(context, str);
         mHelper = new AwareHelper(context);
-        mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public void displayPreference(PreferenceScreen preferenceScreen) {

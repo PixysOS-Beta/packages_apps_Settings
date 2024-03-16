@@ -9,14 +9,21 @@ import android.provider.SearchIndexableResource;
 import android.provider.Settings;
 import android.view.View;
 
+import androidx.preference.PreferenceScreen;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.logging.nano.MetricsProto;
 import com.android.settings.R;
 import com.android.settings.search.BaseSearchIndexProvider;
-import com.android.settings.search.Indexable;
+import android.provider.SearchIndexableResource;
+import com.android.settingslib.search.SearchIndexable;
+import com.android.settingslib.search.Indexable;
 import com.android.settings.utils.CandidateInfoExtra;
+import com.android.settingslib.widget.IllustrationPreference;
+
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import com.android.settingslib.widget.SelectorWithWidgetPreference;
 import com.android.settings.widget.RadioButtonPickerFragment;
-import com.android.settings.widget.RadioButtonPreference;
 import com.android.settingslib.widget.CandidateInfo;
 import com.google.android.settings.aware.AwareHelper;
 
@@ -59,17 +66,22 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
         super.onAttach(context);
         mHelper = new AwareHelper(context);
         mConfig = new AmbientDisplayConfiguration(context);
-        setIllustration(R.raw.aware_display, R.drawable.aware_display);
     }
 
-    public RadioButtonPreference bindPreference(RadioButtonPreference radioButtonPreference,
+    public SelectorWithWidgetPreference bindPreference(SelectorWithWidgetPreference selectorWithWidgetPreference,
             String str, CandidateInfo candidateInfo, String str2) {
         if (candidateInfo instanceof CandidateInfoExtra) {
-            radioButtonPreference.setSummary(((CandidateInfoExtra) candidateInfo).loadSummary());
-            radioButtonPreference.setAppendixVisibility(View.GONE);
+            selectorWithWidgetPreference.setSummary(((CandidateInfoExtra) candidateInfo).loadSummary());
+            selectorWithWidgetPreference.setAppendixVisibility(View.GONE);
         }
-        super.bindPreference(radioButtonPreference, str, candidateInfo, str2);
-        return radioButtonPreference;
+        super.bindPreference(selectorWithWidgetPreference, str, candidateInfo, str2);
+        return selectorWithWidgetPreference;
+    }
+
+    public void addStaticPreferences(PreferenceScreen preferenceScreen) { 
+        IllustrationPreference illustrationPreference = new IllustrationPreference(getContext()); 
+        illustrationPreference.setLottieAnimationResId(R.raw.lottie_aware_display); 
+        preferenceScreen.addPreference(illustrationPreference);
     }
 
     public List<? extends CandidateInfo> getCandidates() {
@@ -90,7 +102,7 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
     }
 
     public int getMetricsCategory() {
-        return MetricsProto.MetricsEvent.DIRTYTWEAKS;
+        return MetricsProto.MetricsEvent.PIXYS;
     }
 
     @Override
