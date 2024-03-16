@@ -25,7 +25,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.Preference.OnPreferenceChangeListener;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -95,11 +95,11 @@ public class ThemeSettings extends DashboardFragment implements
     private ListPreference mThemeStylePref;
     private ListPreference mColorSourcePref;
     private ColorPickerPreference mAccentColorPref;
-    private SwitchPreference mAccentBackgroundPref;
+    private SwitchPreferenceCompat mAccentBackgroundPref;
     private ColorPickerPreference mBgColorPref;
     private CustomSeekBarPreference mLuminancePref;
     private CustomSeekBarPreference mChromaPref;
-    private SwitchPreference mTintBackgroundPref;
+    private SwitchPreferenceCompat mTintBackgroundPref;
 
     @Override
     protected int getPreferenceScreenResId() {

@@ -31,7 +31,7 @@
         android:title="@string/accent_color_title"
         android:summary="@string/accent_color_summary" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:key="accent_background"
         android:title="@string/accent_background_title"
         android:summary="@string/accent_background_summary"
@@ -64,7 +64,7 @@
         settings:units="%"
         settings:showSign="true" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:key="tint_background"
         android:title="@string/tint_background_title"
         android:summary="@string/tint_background_summary"
@@ -89,7 +89,7 @@
         android:title="@string/black_bg_title"
         android:summary="@string/black_bg_summary" />
 
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:key="custom_ui_toggle"
         android:title="@string/custom_ui_toggle_title"
         android:summary="@string/custom_ui_toggle_summary"
