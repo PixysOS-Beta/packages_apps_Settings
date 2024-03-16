@@ -53,7 +53,7 @@ public class SystemDashboardFragment extends DashboardFragment {
     public void showRestrictionDialog() {
         final Bundle args = getArguments();
         if (args != null && args.getBoolean(EXTRA_SHOW_AWARE_DISABLED, false)) {
-            FeatureFactory.getFactory(getContext()).getAwareFeatureProvider()
+            FeatureFactory.getFeatureFactory().getAwareFeatureProvider()
                     .showRestrictionDialog(this);
         }
     }

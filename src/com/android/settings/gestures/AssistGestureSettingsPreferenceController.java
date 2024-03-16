@@ -51,7 +51,7 @@ public class AssistGestureSettingsPreferenceController extends GesturePreference
 
     public AssistGestureSettingsPreferenceController(Context context, String key) {
         super(context, key);
-        mFeatureProvider = FeatureFactory.getFactory(context).getAssistGestureFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAssistGestureFeatureProvider();
         mWasAvailable = isAvailable();
     }
 

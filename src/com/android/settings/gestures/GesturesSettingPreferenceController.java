@@ -39,8 +39,8 @@ public class GesturesSettingPreferenceController extends BasePreferenceControlle
 
     public GesturesSettingPreferenceController(Context context) {
         super(context, KEY_GESTURES_SETTINGS);
-        mFeatureProvider = FeatureFactory.getFactory(context).getAssistGestureFeatureProvider();
-        mAwareFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAssistGestureFeatureProvider();
+        mAwareFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     @Override

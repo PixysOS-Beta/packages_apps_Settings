@@ -64,7 +64,7 @@ public class AlwaysOnDisplaySlice implements CustomSliceable {
     public AlwaysOnDisplaySlice(Context context) {
         mContext = context;
         mConfig = new AmbientDisplayConfiguration(mContext);
-        mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     @Override
