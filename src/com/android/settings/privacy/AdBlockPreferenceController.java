@@ -38,7 +38,7 @@ public class AdBlockPreferenceController extends TogglePreferenceController impl
 
     @Override
     public void updateState(Preference preference) {
-        mPreference = (SwitchPreference)preference;
+        mPreference = (SwitchPreferenceCompat)preference;
         super.updateState(preference);
     }
 

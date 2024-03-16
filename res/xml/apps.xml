@@ -115,6 +115,13 @@
         android:title="@string/special_access"
         android:order="20"/>
 
+   <!-- QuickSwitch -->
+    <Preference android:key="quickswitch" 
+        android:icon="@drawable/ic_home" 
+        android:title="@string/quickswitch_launcher_title" 
+        android:summary="@string/quickswitch_launcher_summary"
+        android:fragment="com.pixys.settings.fragments.QuickSwitch" /> 
+
     <PreferenceCategory
         android:key="advanced_category"
         android:title="@string/advanced_apps"

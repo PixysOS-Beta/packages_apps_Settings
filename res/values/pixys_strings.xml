@@ -363,4 +363,10 @@
     <!-- AdBlock -->
     <string name="enable_adblock">Enable AdBlock</string>
     <string name="enable_adblock_summary">Blocks various ads and trackers system-wide.</string>
+
+
+    <!-- QuickSwitch -->
+    <string name="quickswitch_launcher_title">QuickSwitch</string>
+    <string name="quickswitch_launcher_summary">Customize default homescreen app</string>
+
 </resources>
