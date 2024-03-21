@@ -14,30 +14,33 @@
  * limitations under the License.
  */
 
-package com.android.settings.applications.assist;
+package com.android.settings.gestures;
 
 import android.app.settings.SettingsEnums;
 import android.content.Context;
+import android.provider.SearchIndexableResource;
 
 import com.android.settings.R;
 import com.android.settings.dashboard.DashboardFragment;
-import com.android.settings.gestures.AssistGestureSettingsPreferenceController;
+import com.android.settings.overlay.FeatureFactory;
 import com.android.settings.search.BaseSearchIndexProvider;
 import com.android.settingslib.core.AbstractPreferenceController;
 import com.android.settingslib.core.lifecycle.Lifecycle;
 import com.android.settingslib.search.SearchIndexable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-/**
- * Settings screen to manage everything about assist.
- */
 @SearchIndexable
-public class ManageAssist extends DashboardFragment {
+public class AssistGestureSettings extends DashboardFragment {
 
-    private static final String TAG = "ManageAssist";
-    private static final String KEY_ASSIST = "gesture_assist_application";
+    private static final String TAG = "AssistGesture";
+
+    @Override
+    public int getMetricsCategory() {
+        return SettingsEnums.SETTINGS_ASSIST_GESTURE;
+    }
 
     @Override
     protected String getLogTag() {
@@ -46,7 +49,7 @@ public class ManageAssist extends DashboardFragment {
 
     @Override
     protected int getPreferenceScreenResId() {
-        return R.xml.manage_assist;
+        return R.xml.assist_gesture_settings;
     }
 
     @Override
@@ -54,30 +57,24 @@ public class ManageAssist extends DashboardFragment {
         return buildPreferenceControllers(context, getSettingsLifecycle());
     }
 
-    @Override
-    public int getMetricsCategory() {
-        return SettingsEnums.APPLICATIONS_MANAGE_ASSIST;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        use(AssistGestureSettingsPreferenceController.class).setAssistOnly(true);
-    }
-
     private static List<AbstractPreferenceController> buildPreferenceControllers(Context context,
             Lifecycle lifecycle) {
         final List<AbstractPreferenceController> controllers = new ArrayList<>();
-        controllers.add(new DefaultAssistPreferenceController(context, "default_assist",
-                true /* showSetting */));
-        controllers.add(new AssistContextPreferenceController(context, lifecycle));
-        controllers.add(new AssistScreenshotPreferenceController(context, lifecycle));
-        controllers.add(new AssistFlashScreenPreferenceController(context, lifecycle));
+        controllers.addAll(FeatureFactory.getFactory(context).getAssistGestureFeatureProvider()
+                .getControllers(context, lifecycle));
+
         return controllers;
     }
 
     public static final BaseSearchIndexProvider SEARCH_INDEX_DATA_PROVIDER =
-            new BaseSearchIndexProvider(R.xml.manage_assist) {
+            new BaseSearchIndexProvider() {
+                @Override
+                public List<SearchIndexableResource> getXmlResourcesToIndex(
+                        Context context, boolean enabled) {
+                    final SearchIndexableResource sir = new SearchIndexableResource(context);
+                    sir.xmlResId = R.xml.assist_gesture_settings;
+                    return Arrays.asList(sir);
+                }
 
                 @Override
                 public List<AbstractPreferenceController> createPreferenceControllers(
@@ -86,10 +83,13 @@ public class ManageAssist extends DashboardFragment {
                 }
 
                 @Override
-                public List<String> getNonIndexableKeys(Context context) {
-                    List<String> keys = super.getNonIndexableKeys(context);
-                    keys.add(KEY_ASSIST);
-                    return keys;
+                protected boolean isPageSearchEnabled(Context context) {
+                    AssistGestureSettingsPreferenceController controller =
+                            new AssistGestureSettingsPreferenceController(context,
+                                    "gesture_assist_input_summary");
+                    controller.setAssistOnly(false);
+                    return controller.isAvailable();
                 }
             };
 }
+

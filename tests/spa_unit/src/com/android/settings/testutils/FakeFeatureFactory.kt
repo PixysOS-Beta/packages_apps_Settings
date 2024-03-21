@@ -35,6 +35,7 @@ import com.android.settings.enterprise.EnterprisePrivacyFeatureProvider
 import com.android.settings.fuelgauge.BatterySettingsFeatureProvider
 import com.android.settings.fuelgauge.BatteryStatusFeatureProvider
 import com.android.settings.fuelgauge.PowerUsageFeatureProvider
+import com.android.settings.gestures.AssistGestureFeatureProvider
 import com.android.settings.homepage.contextualcards.ContextualCardFeatureProvider
 import com.android.settings.inputmethod.KeyboardSettingsFeatureProvider
 import com.android.settings.localepicker.LocaleFeatureProvider
@@ -65,6 +66,8 @@ class FakeFeatureFactory : FeatureFactory() {
         setFactory(appContext, this)
     }
 
+    override val assistGestureFeatureProvider: AssistGestureFeatureProvider
+        get() = TODO("Not yet implemented")
     override val suggestionFeatureProvider: SuggestionFeatureProvider
         get() = TODO("Not yet implemented")
     override val hardwareInfoFeatureProvider: HardwareInfoFeatureProvider

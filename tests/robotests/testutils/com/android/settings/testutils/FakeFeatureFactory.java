@@ -38,6 +38,7 @@ import com.android.settings.enterprise.EnterprisePrivacyFeatureProvider;
 import com.android.settings.fuelgauge.BatterySettingsFeatureProvider;
 import com.android.settings.fuelgauge.BatteryStatusFeatureProvider;
 import com.android.settings.fuelgauge.PowerUsageFeatureProvider;
+import com.android.settings.gestures.AssistGestureFeatureProvider;
 import com.android.settings.homepage.contextualcards.ContextualCardFeatureProvider;
 import com.android.settings.inputmethod.KeyboardSettingsFeatureProvider;
 import com.android.settings.localepicker.LocaleFeatureProvider;
@@ -80,6 +81,7 @@ public class FakeFeatureFactory extends FeatureFactory {
     public final SecurityFeatureProvider securityFeatureProvider;
     public final SuggestionFeatureProvider suggestionsFeatureProvider;
     public final UserFeatureProvider userFeatureProvider;
+    public final AssistGestureFeatureProvider assistGestureFeatureProvider;
     public final AccountFeatureProvider mAccountFeatureProvider;
     public final BluetoothFeatureProvider mBluetoothFeatureProvider;
     public final AwareFeatureProvider mAwareFeatureProvider;
@@ -132,6 +134,7 @@ public class FakeFeatureFactory extends FeatureFactory {
         securityFeatureProvider = mock(SecurityFeatureProvider.class);
         suggestionsFeatureProvider = mock(SuggestionFeatureProvider.class);
         userFeatureProvider = mock(UserFeatureProvider.class);
+        assistGestureFeatureProvider = mock(AssistGestureFeatureProvider.class);
         slicesFeatureProvider = mock(SlicesFeatureProvider.class);
         mAccountFeatureProvider = mock(AccountFeatureProvider.class);
         mContextualCardFeatureProvider = mock(ContextualCardFeatureProvider.class);
@@ -233,6 +236,11 @@ public class FakeFeatureFactory extends FeatureFactory {
     @Override
     public UserFeatureProvider getUserFeatureProvider() {
         return userFeatureProvider;
+    }
+
+    @Override
+    public AssistGestureFeatureProvider getAssistGestureFeatureProvider() {
+        return assistGestureFeatureProvider;
     }
 
     @Override

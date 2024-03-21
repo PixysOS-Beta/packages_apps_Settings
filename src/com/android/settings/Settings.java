@@ -46,6 +46,7 @@ public class Settings extends SettingsActivity {
     */
 
     public static class MemtagPageActivity extends SettingsActivity { /* empty */}
+    public static class AssistGestureSettingsActivity extends SettingsActivity { /* empty */}
     public static class BluetoothSettingsActivity extends SettingsActivity { /* empty */ }
     public static class CreateShortcutActivity extends SettingsActivity { /* empty */ }
     public static class FaceSettingsActivity extends SettingsActivity { /* empty */ }
