@@ -21,6 +21,7 @@ import com.android.settings.accessibility.AccessibilityMetricsFeatureProvider
 import com.android.settings.accessibility.AccessibilitySearchFeatureProvider
 import com.android.settings.accounts.AccountFeatureProvider
 import com.android.settings.applications.ApplicationFeatureProvider
+import com.android.settings.aware.AwareFeatureProvider
 import com.android.settings.biometrics.face.FaceFeatureProvider
 import com.android.settings.biometrics.fingerprint.FingerprintFeatureProvider
 import com.android.settings.biometrics2.factory.BiometricsRepositoryProvider
@@ -152,4 +153,7 @@ class FakeFeatureFactory : FeatureFactory() {
         get() = TODO("Not yet implemented")
     override val audioSharingFeatureProvider: AudioSharingFeatureProvider
         get() = TODO("Not yet implemented")
+    override val AwareFeatureProvider: AwareFeatureProvider
+       get() = TODO("Not yet implemented")
+    }
 }
