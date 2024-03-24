@@ -30,9 +30,4 @@ public class BatterySettingsFeatureProviderImpl implements BatterySettingsFeatur
     public boolean isFirstUseDateAvailable(Context context, long firstUseDateMs) {
         return false;
     }
-
-    @Override
-    public boolean isBatteryInfoEnabled(Context context) {
-        return false;
-    }
 }
