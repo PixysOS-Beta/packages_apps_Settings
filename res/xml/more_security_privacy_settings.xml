@@ -94,7 +94,7 @@
                 "com.android.settings.sound.MediaControlsLockScreenPreferenceController" />
 
        <!-- AdBlock -->
-       <SwitchPreference
+       <SwitchPreferenceCompat
            android:key="adblock_enabled"
            android:title="@string/enable_adblock"
            android:summary="@string/enable_adblock_summary"
