@@ -19,7 +19,7 @@ import android.content.Context;
 import android.os.SystemProperties;
 
 import androidx.preference.Preference;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.android.settings.R;
 import com.android.settings.core.TogglePreferenceController;
@@ -30,7 +30,7 @@ public class AdBlockPreferenceController extends TogglePreferenceController impl
     private static final String PROP_ADBLOCK_ENABLED = "persist.sys.adblock_enabled";
     private static final String PROP_ADBLOCK_STATUS = "sys.adblock_status";
 
-    private SwitchPreference mPreference;
+    private SwitchPreferenceCompat mPreference;
 
     public AdBlockPreferenceController(Context context, String key) {
         super(context, key);
