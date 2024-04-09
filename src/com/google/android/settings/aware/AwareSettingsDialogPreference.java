@@ -33,11 +33,11 @@ public class AwareSettingsDialogPreference extends AwareDialogPreferenceBase {
                 ServiceManager.getService(Context.OVERLAY_SERVICE));
         mCurrentUserId = ActivityManager.getCurrentUser();
 
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.Preference);
+        TypedArray a = context.obtainStyledAttributes(attrs, androidx.preference.R.styleable.Preference);
 
-        mAllowDividerAbove = TypedArrayUtils.getBoolean(a, R.styleable.Preference_allowDividerAbove,
+        mAllowDividerAbove = TypedArrayUtils.getBoolean(a, androidx.preference.R.styleable.Preference_allowDividerAbove,
                 R.styleable.Preference_allowDividerAbove, false);
-        mAllowDividerBelow = TypedArrayUtils.getBoolean(a, R.styleable.Preference_allowDividerBelow,
+        mAllowDividerBelow = TypedArrayUtils.getBoolean(a, androidx.preference.R.styleable.Preference_allowDividerBelow,
                 R.styleable.Preference_allowDividerBelow, false);
         a.recycle();
 
