@@ -28,7 +28,7 @@ public class SkipGesturePreferenceController extends GesturePreferenceController
 
     public SkipGesturePreferenceController(Context context, String str) {
         super(context, str);
-        mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
         mHelper = new AwareHelper(context);
     }
 
