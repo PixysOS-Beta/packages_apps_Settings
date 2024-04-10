@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GesturesSettingPreferenceController extends BasePreferenceController {
-    private final AssistGestureFeatureProvider mFeatureProvider;
     private final AwareFeatureProvider mAwareFeatureProvider;
     private List<AbstractPreferenceController> mGestureControllers;
 
@@ -39,7 +38,6 @@ public class GesturesSettingPreferenceController extends BasePreferenceControlle
 
     public GesturesSettingPreferenceController(Context context) {
         super(context, KEY_GESTURES_SETTINGS);
-        mFeatureProvider = FeatureFactory.getFeatureFactory().getAssistGestureFeatureProvider();
         mAwareFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 

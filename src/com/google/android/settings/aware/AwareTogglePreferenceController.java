@@ -4,7 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.android.settings.core.TogglePreferenceController;
 import com.android.settingslib.core.lifecycle.LifecycleObserver;
@@ -17,7 +17,7 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
     protected static final int OFF = 0;
     protected static final int ON = 1;
     protected final AwareHelper mHelper;
-    private SwitchPreference mPreference;
+    private SwitchPreferenceCompat mPreference;
 
     public AwareTogglePreferenceController(Context context, String str) {
         super(context, str);
@@ -30,7 +30,7 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
-        mPreference = (SwitchPreference) preferenceScreen.findPreference(getPreferenceKey());
+        mPreference = (SwitchPreferenceCompat) preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public void updateState(Preference preference) {

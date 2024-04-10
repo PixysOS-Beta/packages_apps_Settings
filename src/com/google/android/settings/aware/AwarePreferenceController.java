@@ -9,7 +9,7 @@ import android.provider.Settings;
 import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 
 import com.android.settings.R;
 import com.android.settings.core.TogglePreferenceController;
@@ -25,7 +25,7 @@ public class AwarePreferenceController extends TogglePreferenceController implem
     private static final int ON = 1;
     private final AwareHelper mHelper;
     private Fragment mParent;
-    private SwitchPreference mPref;
+    private SwitchPreferenceCompat mPref;
 
     public AwarePreferenceController(Context context, String str) {
         super(context, str);
@@ -43,7 +43,7 @@ public class AwarePreferenceController extends TogglePreferenceController implem
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
-        mPref = (SwitchPreference) preferenceScreen.findPreference(getPreferenceKey());
+        mPref = (SwitchPreferenceCompat) preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public void updateState(Preference preference) {

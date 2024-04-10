@@ -10,7 +10,7 @@
         settings:controller="com.android.settings.widget.VideoPreferenceController"
         settings:animation="@raw/aware_settings"
         settings:preview="@drawable/aware_settings" />
-    <SwitchPreference
+    <SwitchPreferenceCompat
         android:key="aware_toggle"
         android:title="@string/aware_settings_title"
         settings:controller="com.google.android.settings.aware.AwarePreferenceController"
