@@ -11,6 +11,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
+import com.android.settings.R;
 import com.android.settings.core.TogglePreferenceController;
 import com.android.settingslib.core.lifecycle.LifecycleObserver;
 import com.android.settingslib.core.lifecycle.events.OnStart;
@@ -29,6 +30,11 @@ public class AwarePreferenceController extends TogglePreferenceController implem
     public AwarePreferenceController(Context context, String str) {
         super(context, str);
         mHelper = new AwareHelper(context);
+    }
+
+    @Override
+    public int getSliceHighlightMenuRes() { 
+       return R.string.menu_key_display;
     }
 
     public void init(Fragment fragment) {

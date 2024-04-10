@@ -24,6 +24,11 @@ public class AwareLockPreferenceController extends AwareTogglePreferenceControll
         mTrustAgentManager = securityFeatureProvider.getTrustAgentManager();
     }
 
+    @Override 
+    public int getSliceHighlightMenuRes() { 
+        return R.string.menu_key_display;
+    }
+
     public int getAvailabilityStatus() {
         return (!mLockPatternUtils.isSecure(UserHandle.myUserId())
                 || !mHelper.isGestureConfigurable()) ? 5 : 0;

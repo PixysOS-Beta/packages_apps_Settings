@@ -20,6 +20,11 @@ public class WakeDisplayPreferenceController extends AwareTogglePreferenceContro
         return (!mHelper.isGestureConfigurable() || !getAmbientConfig().alwaysOnEnabled(mUserId)) ? 5 : 0;
     }
 
+    @Override
+    public int getSliceHighlightMenuRes() { 
+        return R.string.menu_key_display;
+    }
+
     public boolean isChecked() {
         return getAmbientConfig().wakeDisplayGestureEnabled(mUserId);
     }

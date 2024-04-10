@@ -9,6 +9,7 @@ import android.provider.SearchIndexableResource;
 import android.provider.Settings;
 import android.view.View;
 
+import androidx.preference.PreferenceScreen;
 import com.android.internal.annotations.VisibleForTesting;
 import com.android.internal.logging.nano.MetricsProto;
 import com.android.settings.R;
