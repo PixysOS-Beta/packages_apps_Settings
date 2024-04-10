@@ -26,8 +26,8 @@ public class AwareSettingsDialogPreference extends AwareDialogPreferenceBase {
     private IOverlayManager mOverlayManager;
     private int mCurrentUserId;
 
-    public AwareSettingsDialogPreference(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public AwareSettingsDialogPreference(AttributeSet attrs) {
+        super(attrs);
 
         mOverlayManager = IOverlayManager.Stub.asInterface(
                 ServiceManager.getService(Context.OVERLAY_SERVICE));
@@ -36,17 +36,17 @@ public class AwareSettingsDialogPreference extends AwareDialogPreferenceBase {
         TypedArray a = context.obtainStyledAttributes(attrs, androidx.preference.R.styleable.Preference);
 
         mAllowDividerAbove = TypedArrayUtils.getBoolean(a, androidx.preference.R.styleable.Preference_allowDividerAbove,
-                R.styleable.Preference_allowDividerAbove, false);
+                androidx.preference.R.styleable.Preference_allowDividerAbove, false);
         mAllowDividerBelow = TypedArrayUtils.getBoolean(a, androidx.preference.R.styleable.Preference_allowDividerBelow,
-                R.styleable.Preference_allowDividerBelow, false);
+                androidx.preference.R.styleable.Preference_allowDividerBelow, false);
         a.recycle();
 
         setLayoutResource(R.layout.category_preference);
     }
 
     public boolean isAvailable() {
-        return FeatureFactory.getFactory(getContext()).getAwareFeatureProvider()
-                .isSupported(getContext()) && !mHelper.isAirplaneModeOn();
+        return FeatureFactory.getFeatureFactory().getAwareFeatureProvider()
+                .isSupported() && !mHelper.isAirplaneModeOn();
     }
 
     public void performEnabledClick() {

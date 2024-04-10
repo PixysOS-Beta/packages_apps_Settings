@@ -394,10 +394,12 @@
 	<string name="gesture_aware_footer">Quick Gestures use Motion Sense. Learn more about Quick Gestures in Pixel Tips.</string>
 	<string name="gesture_aware_off_dialog_content">To use Quick Gestures, turn on Motion Sense.</string>
 	<string name="gesture_aware_off_dialog_title">Quick Gestures are off</string>
+        <string name="gesture_silence_footer"><annotation link="link">Preferences</annotation></string>
 	<string name="gesture_silence_off_summary">Off / Snooze alarms and silence calls</string>
 	<string name="gesture_silence_on_summary">On / Snooze alarms and silence calls</string>
 	<string name="gesture_silence_summary">Snooze alarms and silence calls</string>
 	<string name="gesture_silence_title">Silence interruptions</string>
+        <string name="gesture_skip_footer"><annotation link="link">Preferences</annotation></string>
 	<string name="gesture_skip_direction_ltr">Swipe left to right for next song</string>
 	<string name="gesture_skip_direction_rtl">Swipe right to left for next song</string>
 	<string name="gesture_skip_direction_title">Swipe direction</string>
@@ -405,6 +407,7 @@
 	<string name="gesture_skip_on_summary">On / Skip to the next or previous song</string>
 	<string name="gesture_skip_summary">Skip to the next or previous song</string>
 	<string name="gesture_skip_title">Skip songs</string>
+        <string name="gesture_tap_footer"><annotation link="link">Preferences</annotation></string>
 	<string name="gesture_tap_on_summary">On / Pause or resume music</string>
 	<string name="gesture_tap_summary">Pause or resume music by tapping the air above the phone</string>
 	<string name="gesture_tap_title">Pause music</string>
@@ -423,5 +426,17 @@
 	<string name="wake_screen_aware_off_dialog_title">Reach to check phone is off</string>
 	<string name="wake_screen_suggestion_summary">Let phone turn on when you reach for it</string>
 	<string name="wake_screen_suggestion_title">Make face unlock faster</string>
+    <string name="gesture_aware_confirmation_action_button">Got it</string>
+    <string name="aware_disabled_preference_neutral">Not now</string>
+    <string name="aware_footer_when_airplane_batterysaver_on">Motion Sense is unavailable because airplane mode and Battery Saver are on</string>
+    <string name="aware_footer_when_airplane_on">Motion Sense is unavailable because airplane mode is on</string>
+    <string name="aware_footer_when_batterysaver_on">Motion Sense is unavailable because Battery Saver is on</string>
+    <string name="aware_gesture_summary_off">Quick Gestures on, Active Edge turned off</string>
+    <string name="aware_gesture_summary_on_non_assist">Quick Gestures on, Active Edge turned on</string>
+    <string name="aware_gesture_summary_on_with_assist">Quick Gestures on, Active Edge on, squeeze for your Assistant</string>
+    <string name="aware_info_button_description">More settings</string>
+    <string name="aware_summary_when_airplane_batterysaver_on">Unavailable because airplane mode and Battery Saver are on</string>
+    <string name="aware_summary_when_airplane_on">Unavailable because airplane mode is on</string>
+    <string name="aware_summary_when_batterysaver_on">Unavailable because Battery Saver is on</string>
 
 </resources>
