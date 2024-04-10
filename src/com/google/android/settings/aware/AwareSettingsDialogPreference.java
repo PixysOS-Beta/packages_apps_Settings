@@ -26,8 +26,8 @@ public class AwareSettingsDialogPreference extends AwareDialogPreferenceBase {
     private IOverlayManager mOverlayManager;
     private int mCurrentUserId;
 
-    public AwareSettingsDialogPreference(AttributeSet attrs) {
-        super(attrs);
+    public AwareSettingsDialogPreference(Context context, AttributeSet attrs) {
+        super(context, attrs);
 
         mOverlayManager = IOverlayManager.Stub.asInterface(
                 ServiceManager.getService(Context.OVERLAY_SERVICE));
@@ -46,7 +46,7 @@ public class AwareSettingsDialogPreference extends AwareDialogPreferenceBase {
 
     public boolean isAvailable() {
         return FeatureFactory.getFeatureFactory().getAwareFeatureProvider()
-                .isSupported() && !mHelper.isAirplaneModeOn();
+                .isSupported(getContext()) && !mHelper.isAirplaneModeOn();
     }
 
     public void performEnabledClick() {
