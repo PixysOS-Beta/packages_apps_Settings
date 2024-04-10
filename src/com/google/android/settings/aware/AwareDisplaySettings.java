@@ -17,6 +17,7 @@ import android.provider.SearchIndexableResource;
 import com.android.settingslib.search.SearchIndexable;
 import com.android.settingslib.search.Indexable;
 import com.android.settings.utils.CandidateInfoExtra;
+import com.android.settingslib.widget.IllustrationPreference;
 
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -64,7 +65,6 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
         super.onAttach(context);
         mHelper = new AwareHelper(context);
         mConfig = new AmbientDisplayConfiguration(context);
-        setIllustration(R.raw.aware_display, R.drawable.aware_display);
     }
 
     public SelectorWithWidgetPreference bindPreference(SelectorWithWidgetPreference selectorWithWidgetPreference,
@@ -75,6 +75,12 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
         }
         super.bindPreference(selectorWithWidgetPreference, str, candidateInfo, str2);
         return selectorWithWidgetPreference;
+    }
+
+    public void addStaticPreferences(PreferenceScreen preferenceScreen) { 
+        IllustrationPreference illustrationPreference = new IllustrationPreference(getContext()); 
+        illustrationPreference.setLottieAnimationResId(R.raw.lottie_aware_display); 
+        preferenceScreen.addPreference(illustrationPreference);
     }
 
     public List<? extends CandidateInfo> getCandidates() {
