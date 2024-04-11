@@ -13,10 +13,4 @@
         settings:allowDividerAbove="true"
         settings:controller="com.google.android.settings.aware.TapGesturePreferenceController"
         settings:keywords="@string/keywords_gesture_tap" />
-    <com.android.settingslib.widget.FooterPreference
-        android:key="tap_gesture_footer"
-        android:selectable="false"
-        android:title="@string/gesture_tap_footer"
-        settings:controller="com.google.android.settings.aware.TapGestureFooterPreferenceController"
-        settings:searchable="false" />
 </PreferenceScreen>
