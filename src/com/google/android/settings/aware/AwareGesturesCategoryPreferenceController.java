@@ -42,7 +42,7 @@ public class AwareGesturesCategoryPreferenceController extends BasePreferenceCon
     public AwareGesturesCategoryPreferenceController(Context context, String str) {
         super(context, str);
         this.mContext = context;
-        this.mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public int getAvailabilityStatus() {

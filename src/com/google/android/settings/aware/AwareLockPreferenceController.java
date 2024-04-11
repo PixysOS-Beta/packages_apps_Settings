@@ -37,7 +37,7 @@ public class AwareLockPreferenceController extends AwareTogglePreferenceControll
 
     public AwareLockPreferenceController(Context context, String str) {
         super(context, str);
-        SecurityFeatureProvider securityFeatureProvider = FeatureFactory.getFactory(context).getSecurityFeatureProvider();
+        SecurityFeatureProvider securityFeatureProvider = FeatureFactory.getFeatureFactory().getSecurityFeatureProvider();
         this.mLockPatternUtils = securityFeatureProvider.getLockPatternUtils(context);
         this.mTrustAgentManager = securityFeatureProvider.getTrustAgentManager();
     }
