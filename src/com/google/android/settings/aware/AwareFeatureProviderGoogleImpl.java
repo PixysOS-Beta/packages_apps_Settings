@@ -16,7 +16,7 @@ public class AwareFeatureProviderGoogleImpl extends AwareFeatureProviderImpl {
     }
 
     public void showRestrictionDialog(Fragment fragment) {
-        AwareEnabledDialogFragment.show(fragment, false);
+        AwareEnabledDialogFragment.show(fragment, Boolean.FALSE);
     }
 
     private static boolean isAllowed(Context context) {

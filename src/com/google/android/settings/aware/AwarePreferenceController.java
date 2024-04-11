@@ -3,114 +3,95 @@ package com.google.android.settings.aware;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.net.Uri;
+import android.content.IntentFilter;
 import android.provider.Settings;
-
 import androidx.fragment.app.Fragment;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreferenceCompat;
-
 import com.android.settings.R;
-import com.android.settings.core.TogglePreferenceController;
-import com.android.settingslib.core.lifecycle.LifecycleObserver;
-import com.android.settingslib.core.lifecycle.events.OnStart;
-import com.android.settingslib.core.lifecycle.events.OnStop;
-import com.google.android.settings.aware.AwareHelper;
 
-public class AwarePreferenceController extends TogglePreferenceController implements
-        DialogInterface.OnClickListener, LifecycleObserver, OnStart, OnStop, AwareHelper.Callback {
-
-    private static final int OFF = 0;
-    private static final int ON = 1;
-    private final AwareHelper mHelper;
+public class AwarePreferenceController extends AwareTogglePreferenceController implements DialogInterface.OnClickListener {
     private Fragment mParent;
-    private SwitchPreferenceCompat mPref;
+
+    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
+        return super.getBackgroundWorkerClass();
+    }
+
+    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
+        return super.getIntentFilter();
+    }
+
+    public int getSliceHighlightMenuRes() {
+        return R.string.menu_key_system;
+    }
+
+    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
+        return super.hasAsyncUpdate();
+    }
+
+    public boolean isSliceable() {
+        return false;
+    }
+
+    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
+        return super.useDynamicSliceSummary();
+    }
 
     public AwarePreferenceController(Context context, String str) {
         super(context, str);
-        mHelper = new AwareHelper(context);
-    }
-
-    @Override
-    public int getSliceHighlightMenuRes() { 
-       return R.string.menu_key_display;
     }
 
     public void init(Fragment fragment) {
-        mParent = fragment;
-    }
-
-    public void displayPreference(PreferenceScreen preferenceScreen) {
-        super.displayPreference(preferenceScreen);
-        mPref = (SwitchPreferenceCompat) preferenceScreen.findPreference(getPreferenceKey());
-    }
-
-    public void updateState(Preference preference) {
-        super.updateState(preference);
-        int availabilityStatus = getAvailabilityStatus();
-        boolean z = true;
-        if (!(availabilityStatus == 0 || availabilityStatus == 1)) {
-            z = false;
-        }
-        preference.setEnabled(z);
+        this.mParent = fragment;
     }
 
     public int getAvailabilityStatus() {
-        return (!mHelper.isSupported() || mHelper.isAirplaneModeOn()) ? 5 : 0;
+        return this.mHelper.isAvailable() ? 0 : 5;
     }
 
     public boolean isChecked() {
-        return Settings.Secure.getInt(mContext.getContentResolver(), "aware_enabled", 0) == 1;
+        return Settings.Secure.getInt(this.mContext.getContentResolver(), "aware_enabled", 0) == 1;
     }
 
     public boolean setChecked(boolean z) {
-        if (mPref.isChecked()) {
-            AwareSettingsDialogFragment.show(mParent, this);
+        if (this.mPreference.isChecked()) {
+            AwareSettingsDialogFragment.show(this.mParent, this);
             return false;
         }
-        Settings.Secure.putInt(mContext.getContentResolver(), "aware_enabled", 1);
+        Settings.Secure.putInt(this.mContext.getContentResolver(), "aware_enabled", 1);
         enableAllFeatures();
         return true;
     }
 
     public void onClick(DialogInterface dialogInterface, int i) {
         if (i == -1) {
-            Settings.Secure.putInt(mContext.getContentResolver(), "aware_enabled", 0);
-            mPref.setChecked(false);
+            Settings.Secure.putInt(this.mContext.getContentResolver(), "aware_enabled", 0);
+            this.mPreference.setChecked(false);
         } else if (i == -2) {
-            mPref.setChecked(true);
+            this.mPreference.setChecked(true);
         }
-    }
-
-    public void onStart() {
-        mHelper.register(this);
-    }
-
-    public void onStop() {
-        mHelper.unregister();
-    }
-
-    public void onChange(Uri uri) {
-        updateState(mPref);
     }
 
     private void enableAllFeatures() {
-        ContentResolver contentResolver = mContext.getContentResolver();
-        if (mHelper.readFeatureEnabled("silence_gesture")) {
+        ContentResolver contentResolver = this.mContext.getContentResolver();
+        if (this.mHelper.readFeatureEnabled("silence_gesture")) {
             Settings.Secure.putInt(contentResolver, "silence_gesture", 1);
         }
-        if (mHelper.readFeatureEnabled("skip_gesture")) {
+        if (this.mHelper.readFeatureEnabled("skip_gesture")) {
             Settings.Secure.putInt(contentResolver, "skip_gesture", 1);
         }
-        if (mHelper.readFeatureEnabled("doze_wake_display_gesture")) {
+        if (this.mHelper.readFeatureEnabled("doze_wake_display_gesture")) {
             Settings.Secure.putInt(contentResolver, "doze_wake_display_gesture", 1);
         }
-        if (mHelper.readFeatureEnabled("doze_wake_screen_gesture")) {
+        if (this.mHelper.readFeatureEnabled("doze_always_on")) {
+            Settings.Secure.putInt(contentResolver, "doze_always_on", 1);
+        }
+        if (this.mHelper.readFeatureEnabled("doze_wake_screen_gesture")) {
             Settings.Secure.putInt(contentResolver, "doze_wake_screen_gesture", 1);
         }
-        if (mHelper.readFeatureEnabled("aware_lock_enabled")) {
+        if (this.mHelper.readFeatureEnabled("aware_lock_enabled")) {
             Settings.Secure.putInt(contentResolver, "aware_lock_enabled", 1);
+        }
+        if (this.mHelper.readFeatureEnabled("tap_gesture")) {
+            Settings.Secure.putInt(contentResolver, "tap_gesture", 1);
         }
     }
 }
