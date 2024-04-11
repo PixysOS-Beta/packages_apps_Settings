@@ -19,9 +19,4 @@
         android:key="gesture_skip_direction"
         android:title="@string/gesture_skip_direction_title"
         settings:controller="com.google.android.settings.aware.SkipGestureDirectionPreferenceController" />
-    <com.android.settingslib.widget.FooterPreference
-        android:key="skip_gesture_footer"
-        android:title="@string/gesture_skip_footer"
-        settings:controller="com.google.android.settings.aware.SkipGestureFooterPreferenceController"
-        settings:searchable="false" />
 </PreferenceScreen>

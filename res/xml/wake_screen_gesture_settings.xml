@@ -13,10 +13,4 @@
         settings:allowDividerAbove="true"
         settings:controller="com.google.android.settings.aware.WakeScreenGesturePreferenceController"
         settings:keywords="@string/keywords_wake_display" />
-    <com.android.settingslib.widget.FooterPreference
-        android:key="wake_screen_gesture_footer"
-        android:selectable="false"
-        android:title="@string/ambient_display_wake_screen_footer"
-        settings:controller="com.google.android.settings.aware.SkipGestureFooterPreferenceController"
-        settings:searchable="false" />
 </PreferenceScreen>
