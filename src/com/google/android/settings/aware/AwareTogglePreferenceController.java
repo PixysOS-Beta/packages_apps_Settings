@@ -5,7 +5,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreference;
+import androidx.preference.SwitchPreferenceCompat;
 import com.android.settings.core.TogglePreferenceController;
 import com.android.settingslib.core.lifecycle.LifecycleObserver;
 import com.android.settingslib.core.lifecycle.events.OnStart;
@@ -16,7 +16,7 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
     protected static final int OFF = 0;
     protected static final int ON = 1;
     protected final AwareHelper mHelper;
-    protected SwitchPreference mPreference;
+    protected SwitchPreferenceCompat mPreference;
 
     public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
         return super.getBackgroundWorkerClass();
@@ -45,7 +45,7 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
-        this.mPreference = (SwitchPreference) preferenceScreen.findPreference(getPreferenceKey());
+        this.mPreference = (SwitchPreferenceCompat) preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public void updateState(Preference preference) {
