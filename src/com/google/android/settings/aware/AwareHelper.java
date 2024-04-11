@@ -98,10 +98,10 @@ public class AwareHelper {
 
         public void observe() {
             ContentResolver contentResolver = AwareHelper.mContext.getContentResolver();
-            contentResolver.registerContentObserver(mAwareEnabled, false, ;
-            contentResolver.registerContentObserver(mAwareAllowed, false, ;
-            contentResolver.registerContentObserver(mAirplaneMode, false, ;
-            contentResolver.registerContentObserver(mBatterySaver, false, ;
+            contentResolver.registerContentObserver(mAwareEnabled, false, this);
+            contentResolver.registerContentObserver(mAwareAllowed, false, this);
+            contentResolver.registerContentObserver(mAirplaneMode, false, this);
+            contentResolver.registerContentObserver(mBatterySaver, false, this);
         }
 
         public void onChange(boolean z, Uri uri) {

@@ -63,7 +63,7 @@ public class SilenceGesturePreferenceController extends GesturePreferenceControl
     }
 
     public void onStart() {
-        mHelper.register(;
+        mHelper.register(this);
     }
 
     public void onStop() {

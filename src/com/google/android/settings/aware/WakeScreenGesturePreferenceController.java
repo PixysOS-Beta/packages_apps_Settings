@@ -70,7 +70,7 @@ public class WakeScreenGesturePreferenceController extends GesturePreferenceCont
     }
 
     public void onStart() {
-        mHelper.register(;
+        mHelper.register(this);
     }
 
     public void onStop() {

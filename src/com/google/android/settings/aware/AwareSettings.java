@@ -31,7 +31,7 @@ public class AwareSettings extends DashboardFragment {
 
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((AwarePreferenceController) use(AwarePreferenceController.class)).init(;
+        ((AwarePreferenceController) use(AwarePreferenceController.class)).init(this);
     }
 
     public void onCreate(Bundle bundle) {

@@ -60,7 +60,7 @@ public class TapGesturePreferenceController extends GesturePreferenceController 
     }
 
     public void onStart() {
-        mHelper.register(;
+        mHelper.register(this);
     }
 
     public void onStop() {

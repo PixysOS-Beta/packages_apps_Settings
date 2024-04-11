@@ -43,7 +43,7 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
     }
 
     public void onStart() {
-        mHelper.register(;
+        mHelper.register(this);
     }
 
     public void onStop() {

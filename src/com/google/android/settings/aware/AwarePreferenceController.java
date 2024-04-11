@@ -36,7 +36,7 @@ public class AwarePreferenceController extends AwareTogglePreferenceController i
 
     public boolean setChecked(boolean z) {
         if (mPreference.isChecked()) {
-            AwareSettingsDialogFragment.show(mParent, ;
+            AwareSettingsDialogFragment.show(mParent,  this);
             return false;
         }
         Settings.Secure.putInt(mContext.getContentResolver(), "aware_enabled", 1);
