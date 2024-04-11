@@ -1,41 +1,13 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.os.SystemProperties;
 import com.android.settings.R;
 
 public abstract class AwareGesturePreferenceController extends AwareBasePreferenceController {
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
 
     /* access modifiers changed from: protected */
     public abstract CharSequence getGestureSummary();
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
-    public /* bridge */ /* synthetic */ int getSliceHighlightMenuRes() {
-        return super.getSliceHighlightMenuRes();
-    }
-
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
-    public /* bridge */ /* synthetic */ boolean isPublicSlice() {
-        return super.isPublicSlice();
-    }
-
-    public /* bridge */ /* synthetic */ boolean isSliceable() {
-        return super.isSliceable();
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
-    }
 
     public AwareGesturePreferenceController(Context context, String str) {
         super(context, str);

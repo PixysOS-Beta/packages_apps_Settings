@@ -1,7 +1,6 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.os.UserHandle;
 import android.provider.Settings;
 import android.text.TextUtils;
@@ -15,24 +14,9 @@ public class AwareLockPreferenceController extends AwareTogglePreferenceControll
     private final LockPatternUtils mLockPatternUtils;
     private final TrustAgentManager mTrustAgentManager;
 
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
 
     public int getSliceHighlightMenuRes() {
         return R.string.menu_key_display;
-    }
-
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
     }
 
     public AwareLockPreferenceController(Context context, String str) {

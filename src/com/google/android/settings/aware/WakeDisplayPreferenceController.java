@@ -1,7 +1,6 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.hardware.display.AmbientDisplayConfiguration;
 import android.os.UserHandle;
 import android.provider.Settings;
@@ -11,24 +10,8 @@ public class WakeDisplayPreferenceController extends AwareTogglePreferenceContro
     private AmbientDisplayConfiguration mAmbientConfig;
     private final int mUserId = UserHandle.myUserId();
 
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
     public int getSliceHighlightMenuRes() {
         return R.string.menu_key_display;
-    }
-
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
     }
 
     public WakeDisplayPreferenceController(Context context, String str) {

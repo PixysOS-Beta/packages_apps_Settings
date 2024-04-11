@@ -1,7 +1,6 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.hardware.display.AmbientDisplayConfiguration;
 import android.net.Uri;
 import android.os.UserHandle;
@@ -25,29 +24,13 @@ public class WakeScreenGesturePreferenceController extends GesturePreferenceCont
     private Preference mPreference;
     private final int mUserId = UserHandle.myUserId();
 
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
     /* access modifiers changed from: protected */
     public String getVideoPrefKey() {
         return PREF_KEY_VIDEO;
     }
 
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
     public boolean isPublicSlice() {
         return true;
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
     }
 
     public WakeScreenGesturePreferenceController(Context context, String str) {

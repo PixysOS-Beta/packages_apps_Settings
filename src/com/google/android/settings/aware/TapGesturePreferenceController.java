@@ -1,7 +1,6 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.Uri;
 import android.provider.Settings;
 import androidx.preference.Preference;
@@ -19,29 +18,13 @@ public class TapGesturePreferenceController extends GesturePreferenceController 
     private AwareHelper mHelper;
     private Preference mPreference;
 
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
     /* access modifiers changed from: protected */
     public String getVideoPrefKey() {
         return PREF_KEY_VIDEO;
     }
 
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
     public boolean isPublicSlice() {
         return true;
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
     }
 
     public TapGesturePreferenceController(Context context, String str) {

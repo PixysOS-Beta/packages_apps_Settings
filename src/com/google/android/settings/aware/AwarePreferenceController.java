@@ -3,7 +3,6 @@ package com.google.android.settings.aware;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
 import android.provider.Settings;
 import androidx.fragment.app.Fragment;
 import com.android.settings.R;
@@ -11,28 +10,12 @@ import com.android.settings.R;
 public class AwarePreferenceController extends AwareTogglePreferenceController implements DialogInterface.OnClickListener {
     private Fragment mParent;
 
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
     public int getSliceHighlightMenuRes() {
         return R.string.menu_key_system;
     }
 
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
     public boolean isSliceable() {
         return false;
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
     }
 
     public AwarePreferenceController(Context context, String str) {

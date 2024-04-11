@@ -1,7 +1,6 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.Uri;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
@@ -17,22 +16,6 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
     protected static final int ON = 1;
     protected final AwareHelper mHelper;
     protected SwitchPreferenceCompat mPreference;
-
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
-    }
 
     public AwareTogglePreferenceController(Context context, String str) {
         super(context, str);
