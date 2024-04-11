@@ -36,16 +36,16 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
 
     public AwareTogglePreferenceController(Context context, String str) {
         super(context, str);
-        this.mHelper = new AwareHelper(context);
+        mHelper = new AwareHelper(context);
     }
 
     public int getAvailabilityStatus() {
-        return this.mHelper.isGestureConfigurable() ? 0 : 5;
+        return mHelper.isGestureConfigurable() ? 0 : 5;
     }
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
-        this.mPreference = (SwitchPreferenceCompat) preferenceScreen.findPreference(getPreferenceKey());
+        mPreference = (SwitchPreferenceCompat) preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public void updateState(Preference preference) {
@@ -60,14 +60,14 @@ public abstract class AwareTogglePreferenceController extends TogglePreferenceCo
     }
 
     public void onStart() {
-        this.mHelper.register(this);
+        mHelper.register(;
     }
 
     public void onStop() {
-        this.mHelper.unregister();
+        mHelper.unregister();
     }
 
     public void onChange(Uri uri) {
-        updateState(this.mPreference);
+        updateState(mPreference);
     }
 }

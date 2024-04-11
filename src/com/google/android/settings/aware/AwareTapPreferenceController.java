@@ -39,7 +39,7 @@ public class AwareTapPreferenceController extends AwareBasePreferenceController 
     }
 
     public CharSequence getSummary() {
-        return this.mContext.getText(isTapGestureEnabled() ? R.string.gesture_tap_on_summary : R.string.gesture_setting_off);
+        return mContext.getText(isTapGestureEnabled() ? R.string.gesture_tap_on_summary : R.string.gesture_setting_off);
     }
 
     public int getAvailabilityStatus() {
@@ -50,6 +50,6 @@ public class AwareTapPreferenceController extends AwareBasePreferenceController 
     }
 
     private boolean isTapGestureEnabled() {
-        return this.mFeatureProvider.isEnabled(this.mContext) && Settings.Secure.getInt(this.mContext.getContentResolver(), "tap_gesture", 0) == 1;
+        return mFeatureProvider.isEnabled(mContext) && Settings.Secure.getInt(mContext.getContentResolver(), "tap_gesture", 0) == 1;
     }
 }

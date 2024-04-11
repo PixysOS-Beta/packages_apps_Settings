@@ -38,29 +38,29 @@ public class AwareLockPreferenceController extends AwareTogglePreferenceControll
     public AwareLockPreferenceController(Context context, String str) {
         super(context, str);
         SecurityFeatureProvider securityFeatureProvider = FeatureFactory.getFeatureFactory().getSecurityFeatureProvider();
-        this.mLockPatternUtils = securityFeatureProvider.getLockPatternUtils(context);
-        this.mTrustAgentManager = securityFeatureProvider.getTrustAgentManager();
+        mLockPatternUtils = securityFeatureProvider.getLockPatternUtils(context);
+        mTrustAgentManager = securityFeatureProvider.getTrustAgentManager();
     }
 
     public int getAvailabilityStatus() {
-        return (!this.mLockPatternUtils.isSecure(UserHandle.myUserId()) || !this.mHelper.isGestureConfigurable()) ? 5 : 0;
+        return (!mLockPatternUtils.isSecure(UserHandle.myUserId()) || !mHelper.isGestureConfigurable()) ? 5 : 0;
     }
 
     public boolean isChecked() {
-        return Settings.Secure.getInt(this.mContext.getContentResolver(), "aware_lock_enabled", 1) == 1;
+        return Settings.Secure.getInt(mContext.getContentResolver(), "aware_lock_enabled", 1) == 1;
     }
 
     public boolean setChecked(boolean z) {
-        this.mHelper.writeFeatureEnabled("aware_lock_enabled", z);
-        Settings.Secure.putInt(this.mContext.getContentResolver(), "aware_lock_enabled", z ? 1 : 0);
+        mHelper.writeFeatureEnabled("aware_lock_enabled", z);
+        Settings.Secure.putInt(mContext.getContentResolver(), "aware_lock_enabled", z ? 1 : 0);
         return true;
     }
 
     public CharSequence getSummary() {
-        CharSequence activeTrustAgentLabel = this.mTrustAgentManager.getActiveTrustAgentLabel(this.mContext, this.mLockPatternUtils);
+        CharSequence activeTrustAgentLabel = mTrustAgentManager.getActiveTrustAgentLabel(mContext, mLockPatternUtils);
         if (!TextUtils.isEmpty(activeTrustAgentLabel)) {
-            return this.mContext.getString(R.string.lockpattern_settings_power_button_instantly_locks_summary, new Object[]{activeTrustAgentLabel});
+            return mContext.getString(R.string.lockpattern_settings_power_button_instantly_locks_summary, new Object[]{activeTrustAgentLabel});
         }
-        return this.mContext.getString(R.string.summary_placeholder);
+        return mContext.getString(R.string.summary_placeholder);
     }
 }

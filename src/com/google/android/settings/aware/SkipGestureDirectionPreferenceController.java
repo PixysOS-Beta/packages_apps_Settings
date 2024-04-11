@@ -43,7 +43,7 @@ public class SkipGestureDirectionPreferenceController extends BasePreferenceCont
     }
 
     public int getAvailabilityStatus() {
-        return FeatureFlagUtils.isEnabled(this.mContext, "settings_skip_direction_mutable") ? 0 : 4;
+        return FeatureFlagUtils.isEnabled(mContext, "settings_skip_direction_mutable") ? 0 : 4;
     }
 
     public void updateState(Preference preference) {
@@ -54,19 +54,19 @@ public class SkipGestureDirectionPreferenceController extends BasePreferenceCont
     }
 
     public boolean onPreferenceChange(Preference preference, Object obj) {
-        Settings.Secure.putInt(this.mContext.getContentResolver(), "skip_gesture_direction", Integer.parseInt((String) obj));
+        Settings.Secure.putInt(mContext.getContentResolver(), "skip_gesture_direction", Integer.parseInt((String) obj));
         updateState(preference);
         return true;
     }
 
     public CharSequence getSummary() {
         if (isDirectionRTL()) {
-            return this.mContext.getResources().getString(R.string.gesture_skip_direction_rtl);
+            return mContext.getResources().getString(R.string.gesture_skip_direction_rtl);
         }
-        return this.mContext.getResources().getString(R.string.gesture_skip_direction_ltr);
+        return mContext.getResources().getString(R.string.gesture_skip_direction_ltr);
     }
 
     private boolean isDirectionRTL() {
-        return Settings.Secure.getIntForUser(this.mContext.getContentResolver(), "skip_gesture_direction", 0, -2) == 0;
+        return Settings.Secure.getIntForUser(mContext.getContentResolver(), "skip_gesture_direction", 0, -2) == 0;
     }
 }

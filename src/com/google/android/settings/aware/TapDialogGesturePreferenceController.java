@@ -47,10 +47,10 @@ public class TapDialogGesturePreferenceController extends AwareGesturePreference
 
     /* access modifiers changed from: protected */
     public CharSequence getGestureSummary() {
-        return this.mContext.getText(isTapGestureEnabled() ? R.string.gesture_tap_on_summary : R.string.gesture_setting_off);
+        return mContext.getText(isTapGestureEnabled() ? R.string.gesture_tap_on_summary : R.string.gesture_setting_off);
     }
 
     private boolean isTapGestureEnabled() {
-        return this.mHelper.isEnabled() && Settings.Secure.getInt(this.mContext.getContentResolver(), "tap_gesture", 0) == 1;
+        return mHelper.isEnabled() && Settings.Secure.getInt(mContext.getContentResolver(), "tap_gesture", 0) == 1;
     }
 }

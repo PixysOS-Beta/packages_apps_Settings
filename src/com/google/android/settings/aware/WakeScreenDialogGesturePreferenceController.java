@@ -40,10 +40,10 @@ public class WakeScreenDialogGesturePreferenceController extends AwareGesturePre
 
     /* access modifiers changed from: protected */
     public CharSequence getGestureSummary() {
-        return this.mContext.getText(isGestureEnabled() ? R.string.gesture_setting_on : R.string.gesture_setting_off);
+        return mContext.getText(isGestureEnabled() ? R.string.gesture_setting_on : R.string.gesture_setting_off);
     }
 
     private boolean isGestureEnabled() {
-        return this.mFeatureProvider.isEnabled(this.mContext) && Settings.Secure.getInt(this.mContext.getContentResolver(), "doze_wake_screen_gesture", 1) == 1;
+        return mFeatureProvider.isEnabled(mContext) && Settings.Secure.getInt(mContext.getContentResolver(), "doze_wake_screen_gesture", 1) == 1;
     }
 }

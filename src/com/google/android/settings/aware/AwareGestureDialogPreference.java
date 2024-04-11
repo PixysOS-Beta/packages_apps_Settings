@@ -30,7 +30,7 @@ abstract class AwareGestureDialogPreference extends AwareDialogPreferenceBase im
 
     /* access modifiers changed from: protected */
     public boolean isAvailable() {
-        return this.mHelper.isGestureConfigurable();
+        return mHelper.isGestureConfigurable();
     }
 
     /* access modifiers changed from: protected */
@@ -42,10 +42,10 @@ abstract class AwareGestureDialogPreference extends AwareDialogPreferenceBase im
     /* access modifiers changed from: protected */
     public void onPrepareDialogBuilder(AlertDialog.Builder builder, DialogInterface.OnClickListener onClickListener) {
         super.onPrepareDialogBuilder(builder, onClickListener);
-        if (!this.mHelper.isSupported()) {
+        if (!mHelper.isSupported()) {
             builder.setTitle(getGestureDialogTitle()).setMessage(getDialogDisabledMessage()).setPositiveButton((int) R.string.gesture_aware_confirmation_action_button, (DialogInterface.OnClickListener) null).setNegativeButton((CharSequence) "", (DialogInterface.OnClickListener) null);
         } else {
-            builder.setTitle(getGestureDialogTitle()).setMessage(getGestureDialogMessage()).setPositiveButton((int) R.string.aware_disabled_preference_action, (DialogInterface.OnClickListener) this).setNegativeButton((int) R.string.aware_disabled_preference_neutral, (DialogInterface.OnClickListener) null);
+            builder.setTitle(getGestureDialogTitle()).setMessage(getGestureDialogMessage()).setPositiveButton((int) R.string.aware_disabled_preference_action, (DialogInterface.OnClickListener) .setNegativeButton((int) R.string.aware_disabled_preference_neutral, (DialogInterface.OnClickListener) null);
         }
     }
 }

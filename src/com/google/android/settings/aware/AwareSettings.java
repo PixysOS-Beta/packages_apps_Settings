@@ -31,14 +31,14 @@ public class AwareSettings extends DashboardFragment {
 
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((AwarePreferenceController) use(AwarePreferenceController.class)).init(this);
+        ((AwarePreferenceController) use(AwarePreferenceController.class)).init(;
     }
 
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Bundle arguments = getArguments();
         if (arguments != null && arguments.getBoolean("show_aware_dialog_enabled", false)) {
-            AwareEnabledDialogFragment.show(this, Boolean.TRUE);
+            AwareEnabledDialogFragment.show( Boolean.TRUE);
         }
     }
 }

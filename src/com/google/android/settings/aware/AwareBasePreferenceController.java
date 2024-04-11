@@ -1,7 +1,6 @@
 package com.google.android.settings.aware;
 
 import android.content.Context;
-import android.content.IntentFilter;
 import android.net.Uri;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
@@ -18,43 +17,15 @@ public class AwareBasePreferenceController extends BasePreferenceController impl
     protected final AwareHelper mHelper;
     private Preference mPreference;
 
-    public /* bridge */ /* synthetic */ Class getBackgroundWorkerClass() {
-        return super.getBackgroundWorkerClass();
-    }
-
-    public /* bridge */ /* synthetic */ IntentFilter getIntentFilter() {
-        return super.getIntentFilter();
-    }
-
-    public /* bridge */ /* synthetic */ int getSliceHighlightMenuRes() {
-        return super.getSliceHighlightMenuRes();
-    }
-
-    public /* bridge */ /* synthetic */ boolean hasAsyncUpdate() {
-        return super.hasAsyncUpdate();
-    }
-
-    public /* bridge */ /* synthetic */ boolean isPublicSlice() {
-        return super.isPublicSlice();
-    }
-
-    public /* bridge */ /* synthetic */ boolean isSliceable() {
-        return super.isSliceable();
-    }
-
-    public /* bridge */ /* synthetic */ boolean useDynamicSliceSummary() {
-        return super.useDynamicSliceSummary();
-    }
-
     public AwareBasePreferenceController(Context context, String str) {
         super(context, str);
-        this.mHelper = new AwareHelper(context);
-        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
+        mHelper = new AwareHelper(context);
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
-        this.mPreference = preferenceScreen.findPreference(getPreferenceKey());
+        mPreference = preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public void updateState(Preference preference) {
@@ -68,18 +39,18 @@ public class AwareBasePreferenceController extends BasePreferenceController impl
     }
 
     public int getAvailabilityStatus() {
-        return this.mHelper.isGestureConfigurable() ? 0 : 5;
+        return mHelper.isGestureConfigurable() ? 0 : 5;
     }
 
     public void onStart() {
-        this.mHelper.register(this);
+        mHelper.register(this);
     }
 
     public void onStop() {
-        this.mHelper.unregister();
+        mHelper.unregister();
     }
 
     public void onChange(Uri uri) {
-        updateState(this.mPreference);
+        updateState(mPreference);
     }
 }

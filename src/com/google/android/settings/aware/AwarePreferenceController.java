@@ -40,57 +40,57 @@ public class AwarePreferenceController extends AwareTogglePreferenceController i
     }
 
     public void init(Fragment fragment) {
-        this.mParent = fragment;
+        mParent = fragment;
     }
 
     public int getAvailabilityStatus() {
-        return this.mHelper.isAvailable() ? 0 : 5;
+        return mHelper.isAvailable() ? 0 : 5;
     }
 
     public boolean isChecked() {
-        return Settings.Secure.getInt(this.mContext.getContentResolver(), "aware_enabled", 0) == 1;
+        return Settings.Secure.getInt(mContext.getContentResolver(), "aware_enabled", 0) == 1;
     }
 
     public boolean setChecked(boolean z) {
-        if (this.mPreference.isChecked()) {
-            AwareSettingsDialogFragment.show(this.mParent, this);
+        if (mPreference.isChecked()) {
+            AwareSettingsDialogFragment.show(mParent, ;
             return false;
         }
-        Settings.Secure.putInt(this.mContext.getContentResolver(), "aware_enabled", 1);
+        Settings.Secure.putInt(mContext.getContentResolver(), "aware_enabled", 1);
         enableAllFeatures();
         return true;
     }
 
     public void onClick(DialogInterface dialogInterface, int i) {
         if (i == -1) {
-            Settings.Secure.putInt(this.mContext.getContentResolver(), "aware_enabled", 0);
-            this.mPreference.setChecked(false);
+            Settings.Secure.putInt(mContext.getContentResolver(), "aware_enabled", 0);
+            mPreference.setChecked(false);
         } else if (i == -2) {
-            this.mPreference.setChecked(true);
+            mPreference.setChecked(true);
         }
     }
 
     private void enableAllFeatures() {
-        ContentResolver contentResolver = this.mContext.getContentResolver();
-        if (this.mHelper.readFeatureEnabled("silence_gesture")) {
+        ContentResolver contentResolver = mContext.getContentResolver();
+        if (mHelper.readFeatureEnabled("silence_gesture")) {
             Settings.Secure.putInt(contentResolver, "silence_gesture", 1);
         }
-        if (this.mHelper.readFeatureEnabled("skip_gesture")) {
+        if (mHelper.readFeatureEnabled("skip_gesture")) {
             Settings.Secure.putInt(contentResolver, "skip_gesture", 1);
         }
-        if (this.mHelper.readFeatureEnabled("doze_wake_display_gesture")) {
+        if (mHelper.readFeatureEnabled("doze_wake_display_gesture")) {
             Settings.Secure.putInt(contentResolver, "doze_wake_display_gesture", 1);
         }
-        if (this.mHelper.readFeatureEnabled("doze_always_on")) {
+        if (mHelper.readFeatureEnabled("doze_always_on")) {
             Settings.Secure.putInt(contentResolver, "doze_always_on", 1);
         }
-        if (this.mHelper.readFeatureEnabled("doze_wake_screen_gesture")) {
+        if (mHelper.readFeatureEnabled("doze_wake_screen_gesture")) {
             Settings.Secure.putInt(contentResolver, "doze_wake_screen_gesture", 1);
         }
-        if (this.mHelper.readFeatureEnabled("aware_lock_enabled")) {
+        if (mHelper.readFeatureEnabled("aware_lock_enabled")) {
             Settings.Secure.putInt(contentResolver, "aware_lock_enabled", 1);
         }
-        if (this.mHelper.readFeatureEnabled("tap_gesture")) {
+        if (mHelper.readFeatureEnabled("tap_gesture")) {
             Settings.Secure.putInt(contentResolver, "tap_gesture", 1);
         }
     }

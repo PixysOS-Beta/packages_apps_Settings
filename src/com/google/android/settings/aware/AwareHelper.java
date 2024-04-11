@@ -28,9 +28,9 @@ public class AwareHelper {
     }
 
     public AwareHelper(Context context) {
-        this.mContext = context;
-        this.mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
-        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
+        mContext = context;
+        mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public boolean isGestureConfigurable() {
@@ -42,28 +42,28 @@ public class AwareHelper {
     }
 
     public boolean isSupported() {
-        return this.mFeatureProvider.isSupported(this.mContext);
+        return mFeatureProvider.isSupported(mContext);
     }
 
     public boolean isEnabled() {
-        return this.mFeatureProvider.isEnabled(this.mContext);
+        return mFeatureProvider.isEnabled(mContext);
     }
 
     public void register(Callback callback) {
-        this.mSettingsObserver.observe();
-        this.mSettingsObserver.setCallback(callback);
+        mSettingsObserver.observe();
+        mSettingsObserver.setCallback(callback);
     }
 
     public void unregister() {
-        this.mContext.getContentResolver().unregisterContentObserver(this.mSettingsObserver);
+        mContext.getContentResolver().unregisterContentObserver(mSettingsObserver);
     }
 
     public void writeFeatureEnabled(String str, boolean z) {
-        this.mContext.getSharedPreferences("aware_settings", 0).edit().putBoolean(str, z).apply();
+        mContext.getSharedPreferences("aware_settings", 0).edit().putBoolean(str, z).apply();
     }
 
     public boolean readFeatureEnabled(String str) {
-        return this.mContext.getSharedPreferences("aware_settings", 0).getBoolean(str, true);
+        return mContext.getSharedPreferences("aware_settings", 0).getBoolean(str, true);
     }
 
     public static boolean isTapAvailableOnTheDevice() {
@@ -72,12 +72,12 @@ public class AwareHelper {
 
     /* access modifiers changed from: package-private */
     public boolean isAirplaneModeOn() {
-        return Settings.Global.getInt(this.mContext.getContentResolver(), "airplane_mode_on", 0) == 1;
+        return Settings.Global.getInt(mContext.getContentResolver(), "airplane_mode_on", 0) == 1;
     }
 
     /* access modifiers changed from: package-private */
     public boolean isBatterySaverModeOn() {
-        return Settings.Global.getInt(this.mContext.getContentResolver(), "low_power", 0) == 1;
+        return Settings.Global.getInt(mContext.getContentResolver(), "low_power", 0) == 1;
     }
 
     private final class SettingsObserver extends ContentObserver {
@@ -93,19 +93,19 @@ public class AwareHelper {
 
         /* access modifiers changed from: private */
         public void setCallback(Callback callback) {
-            this.mCallback = callback;
+            mCallback = callback;
         }
 
         public void observe() {
-            ContentResolver contentResolver = AwareHelper.this.mContext.getContentResolver();
-            contentResolver.registerContentObserver(this.mAwareEnabled, false, this);
-            contentResolver.registerContentObserver(this.mAwareAllowed, false, this);
-            contentResolver.registerContentObserver(this.mAirplaneMode, false, this);
-            contentResolver.registerContentObserver(this.mBatterySaver, false, this);
+            ContentResolver contentResolver = AwareHelper.mContext.getContentResolver();
+            contentResolver.registerContentObserver(mAwareEnabled, false, ;
+            contentResolver.registerContentObserver(mAwareAllowed, false, ;
+            contentResolver.registerContentObserver(mAirplaneMode, false, ;
+            contentResolver.registerContentObserver(mBatterySaver, false, ;
         }
 
         public void onChange(boolean z, Uri uri) {
-            Callback callback = this.mCallback;
+            Callback callback = mCallback;
             if (callback != null) {
                 callback.onChange(uri);
             }

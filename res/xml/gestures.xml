@@ -45,6 +45,10 @@
         settings:searchable="false" />
 </PreferenceCategory>
 
+<PreferenceCategory 
+    android:title="@string/other_gestures_category_title" 
+    android:key="other_gestures" 
+    settings:controller="com.google.android.settings.aware.AwareGesturesCategoryPreferenceController" />
 
     <Preference
         android:key="gesture_swipe_down_fingerprint_input_summary"

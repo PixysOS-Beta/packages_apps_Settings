@@ -39,11 +39,11 @@ public class SkipDialogGesturePreferenceController extends AwareGesturePreferenc
     }
 
     private boolean isSkipGestureEnabled() {
-        return this.mHelper.isEnabled() && Settings.Secure.getInt(this.mContext.getContentResolver(), "skip_gesture", 1) == 1;
+        return mHelper.isEnabled() && Settings.Secure.getInt(mContext.getContentResolver(), "skip_gesture", 1) == 1;
     }
 
     /* access modifiers changed from: protected */
     public CharSequence getGestureSummary() {
-        return this.mContext.getText(isSkipGestureEnabled() ? R.string.gesture_skip_on_summary : R.string.gesture_setting_off);
+        return mContext.getText(isSkipGestureEnabled() ? R.string.gesture_skip_on_summary : R.string.gesture_setting_off);
     }
 }

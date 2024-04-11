@@ -52,20 +52,20 @@ public class WakeScreenGesturePreferenceController extends GesturePreferenceCont
 
     public WakeScreenGesturePreferenceController(Context context, String str) {
         super(context, str);
-        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
-        this.mHelper = new AwareHelper(context);
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
+        mHelper = new AwareHelper(context);
     }
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
-        this.mPreference = preferenceScreen.findPreference(getPreferenceKey());
+        mPreference = preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public int getAvailabilityStatus() {
-        if (!getAmbientConfig().wakeScreenGestureAvailable() || !this.mHelper.isSupported()) {
+        if (!getAmbientConfig().wakeScreenGestureAvailable() || !mHelper.isSupported()) {
             return 3;
         }
-        return !this.mHelper.isGestureConfigurable() ? 5 : 0;
+        return !mHelper.isGestureConfigurable() ? 5 : 0;
     }
 
     public boolean isSliceable() {
@@ -73,40 +73,40 @@ public class WakeScreenGesturePreferenceController extends GesturePreferenceCont
     }
 
     public boolean isChecked() {
-        return getAmbientConfig().wakeLockScreenGestureEnabled(this.mUserId) && this.mFeatureProvider.isEnabled(this.mContext);
+        return getAmbientConfig().wakeLockScreenGestureEnabled(mUserId) && mFeatureProvider.isEnabled(mContext);
     }
 
     public boolean setChecked(boolean z) {
-        this.mHelper.writeFeatureEnabled("doze_wake_screen_gesture", z);
-        return Settings.Secure.putInt(this.mContext.getContentResolver(), "doze_wake_screen_gesture", z ? 1 : 0);
+        mHelper.writeFeatureEnabled("doze_wake_screen_gesture", z);
+        return Settings.Secure.putInt(mContext.getContentResolver(), "doze_wake_screen_gesture", z ? 1 : 0);
     }
 
     @VisibleForTesting
     public void setConfig(AmbientDisplayConfiguration ambientDisplayConfiguration) {
-        this.mAmbientConfig = ambientDisplayConfiguration;
+        mAmbientConfig = ambientDisplayConfiguration;
     }
 
     public void onStart() {
-        this.mHelper.register(this);
+        mHelper.register(;
     }
 
     public void onStop() {
-        this.mHelper.unregister();
+        mHelper.unregister();
     }
 
     public void onChange(Uri uri) {
-        updateState(this.mPreference);
+        updateState(mPreference);
     }
 
     /* access modifiers changed from: protected */
     public boolean canHandleClicks() {
-        return this.mHelper.isGestureConfigurable();
+        return mHelper.isGestureConfigurable();
     }
 
     private AmbientDisplayConfiguration getAmbientConfig() {
-        if (this.mAmbientConfig == null) {
-            this.mAmbientConfig = new AmbientDisplayConfiguration(this.mContext);
+        if (mAmbientConfig == null) {
+            mAmbientConfig = new AmbientDisplayConfiguration(mContext);
         }
-        return this.mAmbientConfig;
+        return mAmbientConfig;
     }
 }

@@ -47,8 +47,8 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
 
     public void onAttach(Context context) {
         super.onAttach(context);
-        this.mHelper = new AwareHelper(context);
-        this.mConfig = new AmbientDisplayConfiguration(context);
+        mHelper = new AwareHelper(context);
+        mConfig = new AmbientDisplayConfiguration(context);
     }
 
     public SelectorWithWidgetPreference bindPreference(SelectorWithWidgetPreference selectorWithWidgetPreference, String str, CandidateInfo candidateInfo, String str2) {
@@ -70,10 +70,10 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
     public List<? extends CandidateInfo> getCandidates() {
         Context context = getContext();
         ArrayList arrayList = new ArrayList();
-        if (this.mHelper.isSupported()) {
-            arrayList.add(new CandidateInfoExtra(context.getText(R.string.aware_wake_display_title), context.getText(R.string.aware_wake_display_summary), KEY_WAKE_DISPLAY, this.mHelper.isGestureConfigurable()));
+        if (mHelper.isSupported()) {
+            arrayList.add(new CandidateInfoExtra(context.getText(R.string.aware_wake_display_title), context.getText(R.string.aware_wake_display_summary), KEY_WAKE_DISPLAY, mHelper.isGestureConfigurable()));
         }
-        if (this.mConfig.alwaysOnAvailableForUser(MY_USER)) {
+        if (mConfig.alwaysOnAvailableForUser(MY_USER)) {
             arrayList.add(new CandidateInfoExtra(context.getText(R.string.doze_always_on_title), context.getText(R.string.doze_always_on_summary), KEY_ALWAYS_ON, true));
         }
         arrayList.add(new CandidateInfoExtra(context.getText(R.string.switch_off_text), (CharSequence) null, KEY_OFF, true));
@@ -82,11 +82,11 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
 
     /* access modifiers changed from: protected */
     public String getDefaultKey() {
-        AmbientDisplayConfiguration ambientDisplayConfiguration = this.mConfig;
+        AmbientDisplayConfiguration ambientDisplayConfiguration = mConfig;
         int i = MY_USER;
         boolean wakeDisplayGestureEnabled = ambientDisplayConfiguration.wakeDisplayGestureEnabled(i);
-        boolean alwaysOnEnabled = this.mConfig.alwaysOnEnabled(i);
-        if (!wakeDisplayGestureEnabled || !this.mHelper.isGestureConfigurable() || !alwaysOnEnabled) {
+        boolean alwaysOnEnabled = mConfig.alwaysOnEnabled(i);
+        if (!wakeDisplayGestureEnabled || !mHelper.isGestureConfigurable() || !alwaysOnEnabled) {
             return alwaysOnEnabled ? KEY_ALWAYS_ON : KEY_OFF;
         }
         return KEY_WAKE_DISPLAY;
@@ -119,21 +119,21 @@ public class AwareDisplaySettings extends RadioButtonPickerFragment {
         }
         switch (c) {
             case 0:
-                this.mHelper.writeFeatureEnabled("doze_always_on", true);
+                mHelper.writeFeatureEnabled("doze_always_on", true);
                 Settings.Secure.putInt(contentResolver, "doze_always_on", 1);
-                this.mHelper.writeFeatureEnabled("doze_wake_display_gesture", false);
+                mHelper.writeFeatureEnabled("doze_wake_display_gesture", false);
                 Settings.Secure.putInt(contentResolver, "doze_wake_display_gesture", 0);
                 break;
             case 1:
-                this.mHelper.writeFeatureEnabled("doze_always_on", true);
+                mHelper.writeFeatureEnabled("doze_always_on", true);
                 Settings.Secure.putInt(contentResolver, "doze_always_on", 1);
-                this.mHelper.writeFeatureEnabled("doze_wake_display_gesture", true);
+                mHelper.writeFeatureEnabled("doze_wake_display_gesture", true);
                 Settings.Secure.putInt(contentResolver, "doze_wake_display_gesture", 1);
                 break;
             case 2:
-                this.mHelper.writeFeatureEnabled("doze_always_on", false);
+                mHelper.writeFeatureEnabled("doze_always_on", false);
                 Settings.Secure.putInt(contentResolver, "doze_always_on", 0);
-                this.mHelper.writeFeatureEnabled("doze_wake_display_gesture", false);
+                mHelper.writeFeatureEnabled("doze_wake_display_gesture", false);
                 Settings.Secure.putInt(contentResolver, "doze_wake_display_gesture", 0);
                 break;
         }

@@ -36,31 +36,31 @@ public class WakeDisplayPreferenceController extends AwareTogglePreferenceContro
     }
 
     public int getAvailabilityStatus() {
-        return (!this.mHelper.isGestureConfigurable() || !getAmbientConfig().alwaysOnEnabled(this.mUserId)) ? 5 : 0;
+        return (!mHelper.isGestureConfigurable() || !getAmbientConfig().alwaysOnEnabled(mUserId)) ? 5 : 0;
     }
 
     public boolean isChecked() {
-        return getAmbientConfig().wakeDisplayGestureEnabled(this.mUserId);
+        return getAmbientConfig().wakeDisplayGestureEnabled(mUserId);
     }
 
     public boolean setChecked(boolean z) {
-        this.mHelper.writeFeatureEnabled("doze_wake_display_gesture", z);
-        Settings.Secure.putInt(this.mContext.getContentResolver(), "doze_wake_display_gesture", z ? 1 : 0);
+        mHelper.writeFeatureEnabled("doze_wake_display_gesture", z);
+        Settings.Secure.putInt(mContext.getContentResolver(), "doze_wake_display_gesture", z ? 1 : 0);
         return true;
     }
 
     public CharSequence getSummary() {
-        return this.mContext.getText(getAmbientConfig().alwaysOnEnabled(this.mUserId) ? R.string.aware_wake_display_summary : R.string.aware_wake_display_summary_aod_off);
+        return mContext.getText(getAmbientConfig().alwaysOnEnabled(mUserId) ? R.string.aware_wake_display_summary : R.string.aware_wake_display_summary_aod_off);
     }
 
     public void setConfig(AmbientDisplayConfiguration ambientDisplayConfiguration) {
-        this.mAmbientConfig = ambientDisplayConfiguration;
+        mAmbientConfig = ambientDisplayConfiguration;
     }
 
     private AmbientDisplayConfiguration getAmbientConfig() {
-        if (this.mAmbientConfig == null) {
-            this.mAmbientConfig = new AmbientDisplayConfiguration(this.mContext);
+        if (mAmbientConfig == null) {
+            mAmbientConfig = new AmbientDisplayConfiguration(mContext);
         }
-        return this.mAmbientConfig;
+        return mAmbientConfig;
     }
 }

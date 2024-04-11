@@ -66,5 +66,5 @@
 -dontwarn androidx.window.extensions.**
 -keep class androidx.window.** { *; }
 
+# Keep SettingsGoogle classes
 -keep class com.google.** { *; }
--keep class vendor.** { *; }

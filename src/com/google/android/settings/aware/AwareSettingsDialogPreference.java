@@ -18,7 +18,7 @@ public class AwareSettingsDialogPreference extends AwareDialogPreferenceBase {
 
     /* access modifiers changed from: protected */
     public boolean isAvailable() {
-        return this.mHelper.isAvailable();
+        return mHelper.isAvailable();
     }
 
     /* access modifiers changed from: protected */

@@ -39,10 +39,10 @@ public class AwareSkipPreferenceController extends AwareBasePreferenceController
     }
 
     public CharSequence getSummary() {
-        return this.mContext.getText(isSkipGestureEnabled() ? R.string.gesture_skip_on_summary : R.string.gesture_setting_off);
+        return mContext.getText(isSkipGestureEnabled() ? R.string.gesture_skip_on_summary : R.string.gesture_setting_off);
     }
 
     private boolean isSkipGestureEnabled() {
-        return this.mFeatureProvider.isEnabled(this.mContext) && Settings.Secure.getInt(this.mContext.getContentResolver(), "skip_gesture", 1) == 1;
+        return mFeatureProvider.isEnabled(mContext) && Settings.Secure.getInt(mContext.getContentResolver(), "skip_gesture", 1) == 1;
     }
 }

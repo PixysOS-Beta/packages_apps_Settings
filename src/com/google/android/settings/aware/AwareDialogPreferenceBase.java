@@ -47,22 +47,22 @@ public class AwareDialogPreferenceBase extends CustomDialogPreferenceCompat {
 
     public void onBindViewHolder(PreferenceViewHolder preferenceViewHolder) {
         super.onBindViewHolder(preferenceViewHolder);
-        this.mTitle = preferenceViewHolder.findViewById(16908310);
-        this.mSummary = preferenceViewHolder.findViewById(16908304);
-        this.mInfoIcon = preferenceViewHolder.findViewById(R.id.info_button);
+        mTitle = preferenceViewHolder.findViewById(16908310);
+        mSummary = preferenceViewHolder.findViewById(16908304);
+        mInfoIcon = preferenceViewHolder.findViewById(R.id.info_button);
         updatePreference();
     }
 
     public void onAttached() {
         super.onAttached();
-        AwareHelper awareHelper = this.mHelper;
+        AwareHelper awareHelper = mHelper;
         if (awareHelper != null) {
             awareHelper.register(new AwareHelper.Callback() {
                 public void onChange(Uri uri) {
-                    AwareDialogPreferenceBase.this.updatePreference();
-                    CharSequence summary = AwareDialogPreferenceBase.this.getSummary();
+                    AwareDialogPreferenceBase.updatePreference();
+                    CharSequence summary = AwareDialogPreferenceBase.getSummary();
                     if (!TextUtils.isEmpty(summary)) {
-                        AwareDialogPreferenceBase.this.setSummary(summary);
+                        AwareDialogPreferenceBase.setSummary(summary);
                     }
                 }
             });
@@ -71,7 +71,7 @@ public class AwareDialogPreferenceBase extends CustomDialogPreferenceCompat {
 
     public void onDetached() {
         super.onDetached();
-        AwareHelper awareHelper = this.mHelper;
+        AwareHelper awareHelper = mHelper;
         if (awareHelper != null) {
             awareHelper.unregister();
         }
@@ -87,18 +87,18 @@ public class AwareDialogPreferenceBase extends CustomDialogPreferenceCompat {
 
     /* access modifiers changed from: protected */
     public void updatePreference() {
-        View view = this.mTitle;
+        View view = mTitle;
         if (view != null) {
             view.setEnabled(isAvailable());
         }
-        View view2 = this.mSummary;
+        View view2 = mSummary;
         if (view2 != null) {
             view2.setEnabled(isAvailable());
         }
-        if (this.mInfoIcon != null) {
+        if (mInfoIcon != null) {
             int i = 0;
-            boolean z = isAvailable() || this.mHelper.isAirplaneModeOn() || this.mHelper.isBatterySaverModeOn();
-            View view3 = this.mInfoIcon;
+            boolean z = isAvailable() || mHelper.isAirplaneModeOn() || mHelper.isBatterySaverModeOn();
+            View view3 = mInfoIcon;
             if (z) {
                 i = 8;
             }
@@ -108,7 +108,7 @@ public class AwareDialogPreferenceBase extends CustomDialogPreferenceCompat {
 
     /* access modifiers changed from: protected */
     public void performEnabledClick() {
-        this.mMetricsFeatureProvider.logClickedPreference(this, getSourceMetricsCategory());
+        mMetricsFeatureProvider.logClickedPreference( getSourceMetricsCategory());
     }
 
     /* access modifiers changed from: protected */
@@ -118,8 +118,8 @@ public class AwareDialogPreferenceBase extends CustomDialogPreferenceCompat {
 
     private void init() {
         Context context = getContext();
-        this.mMetricsFeatureProvider = FeatureFactory.getFeatureFactory().getMetricsFeatureProvider();
+        mMetricsFeatureProvider = FeatureFactory.getFeatureFactory().getMetricsFeatureProvider();
         setWidgetLayoutResource(R.layout.preference_widget_info);
-        this.mHelper = new AwareHelper(context);
+        mHelper = new AwareHelper(context);
     }
 }

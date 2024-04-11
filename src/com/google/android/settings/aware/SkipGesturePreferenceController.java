@@ -48,46 +48,46 @@ public class SkipGesturePreferenceController extends GesturePreferenceController
 
     public SkipGesturePreferenceController(Context context, String str) {
         super(context, str);
-        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
-        this.mHelper = new AwareHelper(context);
+        mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
+        mHelper = new AwareHelper(context);
     }
 
     public void displayPreference(PreferenceScreen preferenceScreen) {
         super.displayPreference(preferenceScreen);
         ((VideoPreference) preferenceScreen.findPreference(PREF_KEY_VIDEO)).setHeight(310.0f);
-        this.mPreference = preferenceScreen.findPreference(getPreferenceKey());
+        mPreference = preferenceScreen.findPreference(getPreferenceKey());
     }
 
     public int getAvailabilityStatus() {
-        if (!this.mFeatureProvider.isSupported(this.mContext)) {
+        if (!mFeatureProvider.isSupported(mContext)) {
             return 3;
         }
-        return !this.mHelper.isGestureConfigurable() ? 5 : 0;
+        return !mHelper.isGestureConfigurable() ? 5 : 0;
     }
 
     /* access modifiers changed from: protected */
     public boolean canHandleClicks() {
-        return this.mHelper.isGestureConfigurable();
+        return mHelper.isGestureConfigurable();
     }
 
     public boolean isChecked() {
-        return this.mFeatureProvider.isEnabled(this.mContext) && Settings.Secure.getInt(this.mContext.getContentResolver(), "skip_gesture", 1) == 1;
+        return mFeatureProvider.isEnabled(mContext) && Settings.Secure.getInt(mContext.getContentResolver(), "skip_gesture", 1) == 1;
     }
 
     public boolean setChecked(boolean z) {
-        this.mHelper.writeFeatureEnabled("skip_gesture", z);
-        return Settings.Secure.putInt(this.mContext.getContentResolver(), "skip_gesture", z ? 1 : 0);
+        mHelper.writeFeatureEnabled("skip_gesture", z);
+        return Settings.Secure.putInt(mContext.getContentResolver(), "skip_gesture", z ? 1 : 0);
     }
 
     public void onStart() {
-        this.mHelper.register(this);
+        mHelper.register(;
     }
 
     public void onStop() {
-        this.mHelper.unregister();
+        mHelper.unregister();
     }
 
     public void onChange(Uri uri) {
-        updateState(this.mPreference);
+        updateState(mPreference);
     }
 }
