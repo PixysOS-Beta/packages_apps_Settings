@@ -30,7 +30,7 @@ public class AwareHelper {
     public AwareHelper(Context context) {
         this.mContext = context;
         this.mSettingsObserver = new SettingsObserver(new Handler(Looper.getMainLooper()));
-        this.mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
     }
 
     public boolean isGestureConfigurable() {

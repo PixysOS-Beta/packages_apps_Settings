@@ -46,7 +46,7 @@ public class TapGesturePreferenceController extends GesturePreferenceController 
 
     public TapGesturePreferenceController(Context context, String str) {
         super(context, str);
-        this.mFeatureProvider = FeatureFactory.getFactory(context).getAwareFeatureProvider();
+        this.mFeatureProvider = FeatureFactory.getFeatureFactory().getAwareFeatureProvider();
         this.mHelper = new AwareHelper(context);
     }
 

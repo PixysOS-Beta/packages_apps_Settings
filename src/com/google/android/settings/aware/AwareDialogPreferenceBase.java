@@ -118,7 +118,7 @@ public class AwareDialogPreferenceBase extends CustomDialogPreferenceCompat {
 
     private void init() {
         Context context = getContext();
-        this.mMetricsFeatureProvider = FeatureFactory.getFactory(context).getMetricsFeatureProvider();
+        this.mMetricsFeatureProvider = FeatureFactory.getFeatureFactory().getMetricsFeatureProvider();
         setWidgetLayoutResource(R.layout.preference_widget_info);
         this.mHelper = new AwareHelper(context);
     }

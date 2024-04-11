@@ -11,7 +11,7 @@ public class AwareSettings extends DashboardFragment {
     public static final BaseSearchIndexProvider SEARCH_INDEX_DATA_PROVIDER = new BaseSearchIndexProvider(R.xml.aware_settings) {
         /* access modifiers changed from: protected */
         public boolean isPageSearchEnabled(Context context) {
-            return FeatureFactory.getFactory(context).getAwareFeatureProvider().isSupported(context);
+            return FeatureFactory.getFeatureFactory().getAwareFeatureProvider().isSupported(context);
         }
     };
 
