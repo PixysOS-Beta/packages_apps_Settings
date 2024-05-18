@@ -444,4 +444,11 @@
     <string name="doze_on_charge_title">Always on when charging</string>
     <string name="doze_on_charge_summary">Always show time and info only when the device is plugged in</string>
 
+    <!-- Play Integrity -->
+    <string name="play_integrity_dashboard_title">Play integrity Spoofs</string>
+    <string name="play_integrity_summary">Methods to pass CTS/Play integrity</string>
+    <string name="play_integrity_update_title">Update Play Integrity Patch</string>
+    <string name="play_integrity_update_summary">Download and apply latest fingerprint to spoof</string>
+    <string name="play_update_title">Update fingerprint</string>
+    <string name="play_fingerprint">Current spoofed values</string>
 </resources>
