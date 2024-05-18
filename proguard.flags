@@ -68,3 +68,6 @@
 
 # Keep SettingsGoogle classes
 -keep class com.google.** { *; }
+
+# Keep PixysOS classes
+-keep class com.pixys.** { *; }
