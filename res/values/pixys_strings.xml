@@ -468,4 +468,11 @@
     <string name="doze_on_charge_title">Always on when charging</string>
     <string name="doze_on_charge_summary">Always show time and info only when the device is plugged in</string>
 
+    <!-- Play Integrity -->
+    <string name="something_play_integrity_dashboard_title">Play Integrity</string>
+    <string name="play_integrity_summary">Adjust Play Integrity settings</string>
+    <string name="play_integrity_update_title">Update Play Integrity Patch</string>
+    <string name="play_integrity_update_summary">Download and apply latest fingerprint to spoof</string>
+    <string name="play_update_title">Update</string>
+    <string name="play_fingerprint">Spoofed values</string>
 </resources>

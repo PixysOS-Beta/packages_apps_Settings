@@ -44,4 +44,8 @@
         android:summary="@string/ignore_window_secure_summary"
         android:defaultValue="false"/>
 
+    <Preference
+        android:key="pintegrity_category"
+        android:title="@string/something_play_integrity_dashboard_title"
+        android:fragment="com.pixys.settings.fragments.playintegrity.PlayIntegrity"/>
 </PreferenceScreen>
