@@ -475,4 +475,5 @@
     <string name="play_integrity_update_summary">Download and apply latest fingerprint to spoof</string>
     <string name="play_update_title">Update fingerprint</string>
     <string name="play_fingerprint">Current spoofed values</string>
+    <string name="play_integrity_certification_url">https://gitlab.com/PixysOS-fourteen/vendor_certification/-/raw/main/CertificationOverlay/res/values/config.xml</string>
 </resources>
