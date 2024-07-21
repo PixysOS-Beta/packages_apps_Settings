@@ -6,5 +6,4 @@
 
     <!-- Show battery information -->
     <bool name="config_show_battery_info" translatable="false">true</bool>
-
 </resources>
