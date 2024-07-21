@@ -17,6 +17,8 @@ import androidx.preference.PreferenceCategory;
 import com.android.settings.R;
 import com.android.settings.SettingsPreferenceFragment;
 
+import com.android.internal.util.pixys.PixysUtils;
+
 import java.io.BufferedReader;
 import java.util.List;
 import java.lang.reflect.Method;
@@ -68,7 +70,7 @@ public class PlayIntegrity extends SettingsPreferenceFragment implements Prefere
             preference.setSelectable(false);
             fingerprintCategory.addPreference(preference);
         }
-        
+
     }
 
     public HashMap<String, String> extractProperties(String input) {
@@ -97,24 +99,26 @@ public class PlayIntegrity extends SettingsPreferenceFragment implements Prefere
 
     public void setPropertiesFromUrl() {
         new AsyncTask<Void, Void, String>() {    
-             
+
             @Override
             protected String doInBackground(Void... voids) {
                 StringBuilder keysBuilder = new StringBuilder();
                 String message = "";
                 try {
-                    URL url = new URL("https://gitlab.com/PixysOS-fourteen/vendor_certification/-/raw/main/CertificationOverlay/res/values/config.xml");
+                    String urlString = getPreferenceManager().getContext().getResources()
+                            .getString(R.string.play_integrity_rro_url);
+                    URL url = new URL(urlString);                    
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setRequestMethod("GET");
                     BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                    
+
                     String content = "";
                     String line;
                     while ((line = reader.readLine()) != null) {
                         content += line;
                     }
                     reader.close();
-    
+
                     HashMap<String, String> properties = extractProperties(content);
                     for (Map.Entry<String, String> entry : properties.entrySet()) {
                         String key = entry.getKey();
@@ -133,7 +137,7 @@ public class PlayIntegrity extends SettingsPreferenceFragment implements Prefere
                 }
                 return message;
             }
-    
+
             @Override
             protected void onPostExecute(String message) {
                 killGmsProcess();
@@ -148,7 +152,7 @@ public class PlayIntegrity extends SettingsPreferenceFragment implements Prefere
         fingerprintCategory.removeAll();
         String keysList = SystemProperties.get("persist.sys.pihooks.gms.list");
         String[] keys = keysList.split("\\+");
-    
+
         for (String key : keys) {
             String value = SystemProperties.get("persist.sys.pihooks.gms." + key);
             Preference preference = new Preference(getPreferenceManager().getContext());
@@ -161,34 +165,6 @@ public class PlayIntegrity extends SettingsPreferenceFragment implements Prefere
     }
 
     public void killGmsProcess() {
-        new AsyncTask<Void, Void, String>() {
-            @Override
-            protected String doInBackground(Void... voids) {
-                String message = "";
-                try {
-                    ActivityManager am = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
-                    List<RunningAppProcessInfo> runningAppProcesses = am.getRunningAppProcesses();
-                    for (RunningAppProcessInfo processInfo : runningAppProcesses) {
-                        if (processInfo.processName.equals("com.google.android.gms")) {
-                            Method forceStopPackage = am.getClass().getDeclaredMethod("forceStopPackage", String.class);
-                            forceStopPackage.setAccessible(true);
-                            forceStopPackage.invoke(am, "com.google.android.gms");
-                            break;
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    message = "Failed to kill Google Play Services. Please kill them manually.";
-                }
-                return message;
-            }
-
-            @Override
-            protected void onPostExecute(String message) {
-                if (!message.isEmpty()) {
-                    Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-                }
-            }
-        }.execute();
+        PixysUtils.showPackageRestartDialog(getContext(), "com.google.android.gms");
     }
 }

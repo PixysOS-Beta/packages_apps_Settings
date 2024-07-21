@@ -7,4 +7,6 @@
     <!-- Show battery information -->
     <bool name="config_show_battery_info" translatable="false">true</bool>
 
+   <!-- Play intergrity hack -->
+    <string name="play_integrity_rro_url">https://gitlab.com/PixysOS-fourteen/vendor_certification/-/raw/main/CertificationOverlay/res/values/config.xml</string>
 </resources>
