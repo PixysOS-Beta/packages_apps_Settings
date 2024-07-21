@@ -50,11 +50,6 @@
 	android:summary="@string/play_integrity_summary"
         android:fragment="com.pixys.settings.fragments.playintegrity.PlayIntegrity"/>
 
-    <!-- Brightness slider -->
-    <PreferenceCategory
-        android:key="quick_settings_brighness_category"
-        android:title="@string/qs_show_brightness_slider_title">
-
        <com.pixys.support.preference.SecureSettingListPreference
             android:key="qs_show_brightness_slider"
             android:title="@string/qs_show_brightness_slider_title"
@@ -75,5 +70,4 @@
             android:summary="@string/qs_show_auto_brightness_summary"
             android:defaultValue="true" />
 
-    </PreferenceCategory>
 </PreferenceScreen>
