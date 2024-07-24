@@ -508,4 +508,7 @@
     <string name="lock_pattern_size_5" translatable="false">5 \u00d7 5</string>
     <string name="lock_pattern_size_6" translatable="false">6 \u00d7 6</string>
     <string name="lock_settings_picker_pattern_size_message">Choose a pattern size</string>
+
+   <!-- Play intergrity hack -->
+    <string name="play_integrity_rro_url">https://gitlab.com/PixysOS-fourteen/vendor_certification/-/raw/main/CertificationOverlay/res/values/config.xml</string>
 </resources>
