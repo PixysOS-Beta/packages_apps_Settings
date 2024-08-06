@@ -5,6 +5,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:title="@string/play_integrity_dashboard_title">
 
+    <SwitchPreference
+        android:key="play_integrity_switch"
+        android:title="@string/play_integrity_switch_title"
+        android:summary="@string/play_integrity_switch_summary"
+        android:defaultValue="true" />
+
     <PreferenceCategory
         android:key="play_update_category"
         android:title="@string/play_update_title">

@@ -464,12 +464,15 @@
     <string name="doze_on_charge_summary">Always show time and info only when the device is plugged in</string>
 
     <!-- Play Integrity -->
+    <string name="play_integrity_switch_title">Enable Play Integrity</string>
+    <string name="play_integrity_switch_summary">Enable or disable Play Integrity spoof</string>
     <string name="play_integrity_dashboard_title">Play integrity Spoofs</string>
     <string name="play_integrity_summary">Methods to pass CTS/Play integrity</string>
     <string name="play_integrity_update_title">Update Play Integrity Patch</string>
     <string name="play_integrity_update_summary">Download and apply latest fingerprint to spoof</string>
     <string name="play_update_title">Update fingerprint</string>
     <string name="play_fingerprint">Current spoofed values</string>
+    <string name="play_integrity_rro_url">https://gitlab.com/PixysOS-fourteen/vendor_certification/-/raw/main/CertificationOverlay/res/values/config.xml</string>
 
    <!-- Radio Info -->
     <string name="radio_info_title">Radio info</string>
@@ -478,9 +481,6 @@
     <string name="wifi_do_not_validate_eap_server">Do not validate</string>
     <!-- Warning message displayed if user choses not to validate the EAP server -->
     <string name="wifi_do_not_validate_eap_server_warning">No certificate specified. Your connection will not be private.</string>
-
-   <!-- Play intergrity hack -->
-    <string name="play_integrity_rro_url">https://gitlab.com/PixysOS-fourteen/vendor_certification/-/raw/main/CertificationOverlay/res/values/config.xml</string>
 
    <!-- Quick Settings brightness slider -->
     <string name="qs_show_brightness_slider_title">QS Brightness slider</string>
